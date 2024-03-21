@@ -5,9 +5,23 @@
 
 using namespace std;
 
+/*
+- Image (class)  `Image varName("image.png")` for loading images
+- `image.saveImage("newFilename.png")` for saving images
+- `image(x, y, channel)` for accessing RGB values
+- `Image varName(width, height)` for creating a blank image of width x height
+- `varName.loadNewImage("image.png")` to load an image into a blank image
+- `.loadNewImage()` and `.saveImage()` can also return booleans
+- `varName.setPixel(x, y, channel, value)`
+- `varName.getPixel(x, y, channel) = value`
+- `varName.width`, `varName.height`, `varName.channels`
+ */
+
+
 // General Functions
 void filterSelection();
 string saveImage(Image &image);
+Image imageInput();
 
 // Image Inversion
 void invertImage(Image &image);
@@ -43,7 +57,7 @@ int main() {
 }
 
 // General Helper Functions
-void filterSelection() {
+Image imageInput() {
     // File name input
     cout << "Insert an image name with the extension (.g img.png)" << el
          << "Allowed extensions are .png, .bmp, .tga, .jpg" << el;
@@ -53,6 +67,11 @@ void filterSelection() {
 
     // Main image loading
     Image image(imageName);
+    return image;
+}
+
+void filterSelection() {
+    Image image = imageInput();
 
     bool loopStatus = true;
     while (loopStatus) {
