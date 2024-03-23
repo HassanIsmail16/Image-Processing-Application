@@ -22,15 +22,20 @@ using namespace std;
 void filterSelection();
 string saveImage(Image &image);
 Image imageInput();
+void copyImage(Image &source, Image &destination);
 
 // GrayScale Filtering
 void GSfilter(Image &image);
 
-// Black and white filter
+// Black and White Filter
 void blackAndWhiteFilter(Image &image);
 
 // Image Inversion
 void invertImage(Image &image);
+
+// Flip Image
+void flipImageHorizontally(Image &image);
+void flipImageVertically(Image &image);
 
 int main() {
     // Display Header
@@ -113,7 +118,26 @@ void filterSelection() {
                 break;
             }
             case 5: {
-                // Flip Filter
+                cout << "Please select one of the following choices:" << el
+                     << "1) Flip Horizontally " << el
+                     << "2) Flip Vertically" << el;
+                
+                int flipChoice;
+                cin >> flipChoice;
+                cin.clear();
+                cin.ignore();
+
+                switch (flipChoice) {
+                    case 1:
+                        flipImageHorizontally(image);
+                        break;
+                    case 2:
+                        flipImageVertically(image);
+                        break;
+                    default:
+                        cout << "Invalid Choice. Please select 1 or 2..." << el;
+                        break;
+                }
                 break;
             }
             case 6: {
@@ -150,6 +174,16 @@ string saveImage(Image &image) {
     return "Save Current";
 }
 
+void copyImage(Image &source, Image &destination){
+    for (int i = 0; i < destination.width; ++i) {
+        for (int j = 0; j < destination.height; ++j) {
+            for (int k = 0; k < destination.channels; ++k) {
+                destination(i, j, k) = source(i, j, k);
+            }
+        }
+    }
+}
+
 // GrayScale Filter
 void GSfilter(Image &image){
     for(int i = 0; i < image.width; ++i){
@@ -174,7 +208,7 @@ void blackAndWhiteFilter(Image &image){
             // Calculate greyscale intensity to determine if the color is closer to black or white
             greyScaleValue = (image(i, j, 0) + image(i, j, 1) + image(i, j, 2)) / 3;
 
-            // If the greyscale intensity is closer to black back the pixel black, other wise make it white.
+            // If the greyscale intensity is closer to black back the pixel black, otherwise make it white.
             if (greyScaleValue < 128){
                 color = 0;
             }
@@ -201,3 +235,29 @@ void invertImage(Image &image) {
     }
 }
 
+// Flip Image
+void flipImageHorizontally(Image &image){
+    Image copy(image.width, image.height);
+    copyImage(image, copy);
+
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            for (int k = 0; k < image.channels; ++k) {
+                image(i, j, k) = copy(image.width - 1 - i, j, k);
+            }
+        }
+    }
+}
+
+void flipImageVertically(Image &image){
+    Image copy(image.width, image.height);
+    copyImage(image, copy);
+
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            for (int k = 0; k < image.channels; ++k) {
+                image(i, j, k) = copy(i, image.height - 1 - j, k);
+            }
+        }
+    }
+}
