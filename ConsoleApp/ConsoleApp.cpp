@@ -23,6 +23,9 @@ void filterSelection();
 string saveImage(Image &image);
 Image imageInput();
 
+// GrayScale Filtering
+void GSfilter(Image &image);
+
 // Image Inversion
 void invertImage(Image &image);
 
@@ -94,7 +97,7 @@ void filterSelection() {
 
         switch (choice) {
             case 1: {
-                // Grayscale Filter
+                GSfilter(image);
                 break;
             }
             case 2: {
@@ -145,6 +148,22 @@ string saveImage(Image &image) {
     image.saveImage(saveName);
 
     return "Save Current";
+}
+
+// GrayScale Filter
+void GSfilter(Image &image){
+    for(int i = 0; i < image.width; ++i){
+        for(int j = 0; j < image.height; ++j){
+            unsigned int avg = 0;
+            for(int k = 0; k < 3; ++k){
+                avg += image(i, j, k);
+            }
+            avg = avg/3;
+            for (int k = 0; k < 3; ++k) {
+                image(i, j, k) = avg;
+            }
+        }
+    }
 }
 
 // Image Inversion Filter
