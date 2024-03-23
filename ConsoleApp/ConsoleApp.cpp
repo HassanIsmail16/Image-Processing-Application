@@ -26,6 +26,9 @@ Image imageInput();
 // GrayScale Filtering
 void GSfilter(Image &image);
 
+// Black and white filter
+void blackAndWhiteFilter(Image &image);
+
 // Image Inversion
 void invertImage(Image &image);
 
@@ -98,7 +101,7 @@ void filterSelection() {
                 break;
             }
             case 2: {
-                // B&W Filter
+                blackAndWhiteFilter(image);
                 break;
             }
             case 3: {
@@ -136,7 +139,7 @@ void filterSelection() {
 
 string saveImage(Image &image) {
     // New file name input
-    cout << "Enter the name of the new image with the extension (e.g img.png): ";
+    cout << "Enter the name of the new image with the extension (e.g img.png):" << el;
 
     string saveName;
     cin >> saveName;
@@ -163,6 +166,30 @@ void GSfilter(Image &image){
     }
 }
 
+// Black and white filter
+void blackAndWhiteFilter(Image &image){
+    unsigned int greyScaleValue, color;
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            // Calculate greyscale intensity to determine if the color is closer to black or white
+            greyScaleValue = (image(i, j, 0) + image(i, j, 1) + image(i, j, 2)) / 3;
+
+            // If the greyscale intensity is closer to black back the pixel black, other wise make it white.
+            if (greyScaleValue < 128){
+                color = 0;
+            }
+            else{
+                color = 255;
+            }
+
+            // Change the color of the pixel
+            for (int k = 0; k < image.channels; ++k) {
+                image(i, j, k) = color;
+            }
+        }
+    }
+}
+
 // Image Inversion Filter
 void invertImage(Image &image) {
     for (int x = 0; x < image.width; x++) {
@@ -173,3 +200,4 @@ void invertImage(Image &image) {
         }
     }
 }
+
