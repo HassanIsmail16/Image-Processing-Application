@@ -26,11 +26,11 @@ Image imageInput();
 // GrayScale Filtering
 void GSfilter(Image &image);
 
+// Black and white filter
+void blackAndWhiteFilter(Image &image);
+
 // Image Inversion
 void invertImage(Image &image);
-
-// Black and white filter
-void blackAndWhite(Image &image);
 
 int main() {
     // Display Header
@@ -101,7 +101,7 @@ void filterSelection() {
                 break;
             }
             case 2: {
-                blackAndWhite(image);
+                blackAndWhiteFilter(image);
                 break;
             }
             case 3: {
@@ -166,19 +166,8 @@ void GSfilter(Image &image){
     }
 }
 
-// Image Inversion Filter
-void invertImage(Image &image) {
-    for (int x = 0; x < image.width; x++) {
-        for (int y = 0; y < image.height; y++) {
-            for (int channel = 0; channel < image.channels; channel++) {
-                image(x, y, channel) = 255 - image(x, y, channel);
-            }
-        }
-    }
-}
-
 // Black and white filter
-void blackAndWhite(Image &image){
+void blackAndWhiteFilter(Image &image){
     unsigned int greyScaleValue, color;
     for (int i = 0; i < image.width; ++i) {
         for (int j = 0; j < image.height; ++j) {
@@ -200,3 +189,15 @@ void blackAndWhite(Image &image){
         }
     }
 }
+
+// Image Inversion Filter
+void invertImage(Image &image) {
+    for (int x = 0; x < image.width; x++) {
+        for (int y = 0; y < image.height; y++) {
+            for (int channel = 0; channel < image.channels; channel++) {
+                image(x, y, channel) = 255 - image(x, y, channel);
+            }
+        }
+    }
+}
+
