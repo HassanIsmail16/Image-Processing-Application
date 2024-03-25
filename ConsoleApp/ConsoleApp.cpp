@@ -213,7 +213,7 @@ void blackAndWhiteFilter(Image &image){
                 color = 0;
             }
             else{
-                color = 255;
+                color = 245;
             }
 
             // Change the color of the pixel
