@@ -33,6 +33,9 @@ void blackAndWhiteFilter(Image &image);
 // Image Inversion
 void invertImage(Image &image);
 
+// Image Merging
+void mergeFilter(Image &image);
+
 // Flip Image
 void flipImageHorizontally(Image &image);
 void flipImageVertically(Image &image);
@@ -114,7 +117,7 @@ void filterSelection() {
                 break;
             }
             case 4: {
-                // Merge Filter
+                mergeFilter(image);
                 break;
             }
             case 5: {
@@ -232,6 +235,30 @@ void invertImage(Image &image) {
                 image(x, y, channel) = 255 - image(x, y, channel);
             }
         }
+    }
+}
+
+// Merge Filter
+void mergeFilter(Image &image) {
+    cout << "Insert a second image to merge" << el;
+    string imgName; cin >> imgName;
+    Image imageToMegre(imgName);
+
+    unsigned int merge = 0;
+
+    if (image.width == imageToMegre.width && image.height == imageToMegre.height) {
+        for (int i = 0; i < image.width; ++i) {
+            for (int j = 0; j < image.height; ++j) {
+                for (int k = 0; k < 3; ++k) {
+                    merge = image(i, j, k) + imageToMegre(i, j, k);
+                    image(i, j, k) = merge / 2;
+                }
+                merge = 0;
+            }
+        }
+    } else {
+        cout << "Please resize the images to merge." << el;
+        return;
     }
 }
 
