@@ -97,8 +97,14 @@ void filterSelection() {
              << "4) Merge Images" << el
              << "5) Flip Image" << el
              << "6) Rotate Image" << el
-             << "7) Save current Image" << el
-             << "8) Return to previous menu" << el;
+             << "7) Darken and Lighten Image" << el
+             << "8) Crop Images" << el
+             << "9) Adding a Frame to the Picture" << el
+             << "10) Detect Image Edges" << el
+             << "11) Resizing Images" << el
+             << "12) Blur Images" << el
+             << "13) Save current Image" << el
+             << "14) Return to previous menu" << el;
 
         int choice;
         cin >> choice;
@@ -148,11 +154,35 @@ void filterSelection() {
                 break;
             }
             case 7: {
+                // Darken and Lighten Image
+                break;
+            }
+            case 8: {
+                // Crop Images
+                break;
+            }
+            case 9: {
+                // Aِdding a Frame to the Picture
+                break;
+            }
+            case 10: {
+                // Detect Image Edges
+                break;
+            }
+            case 11: {
+                // Resizing Images
+                break;
+            }
+            case 12: {
+                // Blur Images
+                break;
+            }
+            case 13: {
                 saveImage(image);
                 loopStatus = false;
                 break;
             }
-            case 8: {
+            case 14: {
                 cout << "Returning to previous menu... " << el;
                 loopStatus = false;
                 break;
