@@ -40,6 +40,10 @@ void mergeFilter(Image &image);
 void flipImageHorizontally(Image &image);
 void flipImageVertically(Image &image);
 
+// Darken and Lighten Image
+void darkFilter(Image &image);
+void lightFilter(Image &image);
+
 int main() {
     // Display Header
     cout << "---------------------------------------" << el
@@ -154,7 +158,26 @@ void filterSelection() {
                 break;
             }
             case 7: {
-                // Darken and Lighten Image
+                cout << "Please select one of the following choices:" << el
+                     << "1) Darken Image" << el
+                     << "2) Lighten Image" << el;
+
+                int DarkorLightChoice;
+                cin >> DarkorLightChoice;
+                cin.clear();
+                cin.ignore();
+
+                switch (DarkorLightChoice) {
+                    case 1:
+                        darkFilter(image);
+                        break;
+                    case 2:
+                        lightFilter(image);
+                        break;
+                    default:
+                        cout << "Invalid Choice. Please select 1 or 2..." << el;
+                        break;
+                }
                 break;
             }
             case 8: {
@@ -314,6 +337,38 @@ void flipImageVertically(Image &image){
         for (int j = 0; j < image.height; ++j) {
             for (int k = 0; k < image.channels; ++k) {
                 image(i, j, k) = copy(i, image.height - 1 - j, k);
+            }
+        }
+    }
+}
+
+// Darken and Lighten Image
+void darkFilter(Image &image) {
+    int dark;
+
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            for (int k = 0; k < 3; ++k) {
+                dark = image(i, j, k);
+                if (image(i, j, k) > dark / 2)
+                    image(i, j, k) -= dark / 2;
+                else
+                    image(i, j, k) = 0;
+            }
+        }
+    }
+}
+void lightFilter(Image &image){
+    int light;
+
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            for (int k = 0; k < 3; ++k) {
+                light = image(i, j, k);
+                if(image(i,j,k) + (light / 2) < 255)
+                    image(i, j, k) += light / 2;
+                else
+                    image(i,j,k) = 255;
             }
         }
     }
