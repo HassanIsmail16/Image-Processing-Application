@@ -1,3 +1,17 @@
+/*
+FCAI – Structured Programming [CS112] – 2024 - Assignment 3
+Program Name:			    CS112_A3_Part1_S18_20230347_20230432_20230588.cpp
+Program Description:        The program contains: Grayscale filter, Black and White filter, Image inversion filter, Merge image filter (INCOMPLETE), Flip image filter, and Image rotation filter.
+Last Modification Date:	    27/03/2024
+Author1 (name - ID - Group - Section - Email):	Hassan Ali Hassan Ali                       20230588 B S18  20230588@stud.fci-cu.edu.eg
+Author2 (name - ID - Group - Section - Email):	Momen Abd El-Kader Abd El-Naby Abd El-Kader 20230432 B S18  20230432@stud.fci-cu.edu.eg
+Author3 (name - ID - Group - Section - Email):	Mohamed Ali Hassan Amin                     20230347 B S18  11410120230347@stud.cu.edu.eg
+Teaching Assistant:		    Ahmed Foad Lotfy
+Who did what:
+    Hassan Ali:         Main Menu, Image Input Function, Image Save Function, Filter Selection Function, Invert Image Filter, Image Rotation Filters.
+    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter.
+    Mohamed Ali:        Grayscale Filter, Merge Image Filter (INCOMPLETE), Lighten & Darken Image Filters.
+ */
 #include <bits/stdc++.h>
 #include "../../Image_Class.h"
 #define el '\n'
@@ -91,7 +105,7 @@ Image imageInput() {
         // File name input
         getline(cin, imageName);
         try {
-            image.loadNewImage(imageName, 3);
+            image.loadNewImage(imageName);
             cout << "Image Loaded Successfully." << el;
             cout << "-------------------------------------" << el;
             break;
@@ -103,7 +117,7 @@ Image imageInput() {
     }
 
     // Main image loading
-    image.loadNewImage(imageName, 3);
+    image.loadNewImage(imageName);
     return image;
 }
 
@@ -453,7 +467,7 @@ void rotate90(Image &image) {
     }
     flipImageHorizontally(result);
     result.saveImage("temp.png");
-    image.loadNewImage("temp.png", 3);
+    image.loadNewImage("temp.png");
 }
 
 void rotate180(Image &image) {
