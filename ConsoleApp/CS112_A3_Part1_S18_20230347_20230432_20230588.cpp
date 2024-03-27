@@ -51,6 +51,9 @@ void rotate270(Image &image);
 void darkFilter(Image &image);
 void lightFilter(Image &image);
 
+// Resize Images
+void resizeImage(Image &image, int newWidth, int newHeight);
+
 int main() {
     // Display Header
     cout << "---------------------------------------" << el
@@ -288,7 +291,23 @@ void filterSelection() {
                 break;
             }
             case 11: {
-                // Resizing Images
+                regex validDimensions(R"((\d+)\s[*xX]\s(\d+))");
+                smatch matches;
+                cout << "Please enter the new dimensions in the format width * height (e.g. 1920 * 1080 or 1920 x 1080)" << el;
+
+                // Input
+                string dimensions;
+                getline(cin, dimensions);
+
+                // Input validation
+                if (regex_match(dimensions, matches, validDimensions)){
+                    int newWidth = stoi(matches[1]);
+                    int newHeight = stoi(matches[2]);
+                    resizeImage(image, newWidth, newHeight);
+                } else{
+                    cout << "Invalid Dimensions. Please enter the new dimensions in the format width * height (e.g. 1920 * 1080 or 1920 x 1080)." << el;
+                    cout << "-------------------------------------" << el;
+                }
                 break;
             }
             case 12: {
@@ -512,4 +531,27 @@ void lightFilter(Image &image){
             }
         }
     }
+}
+
+// Resize Image
+void resizeImage(Image &image, int newWidth, int newHeight){
+    // Initialize an image with the new dimensions
+    Image newImage(newWidth, newHeight);
+
+    // Calculate the ration between old and new dimensions
+    double widthRatio = double(image.width) / double(newImage.width);
+    double heightRatio = double(image.height) / double(newImage.height);
+
+    for (int row = 0; row < newImage.width; ++row) {
+        for (int col = 0; col < newImage.height; ++col) {
+            // Map each pixel in the resized image to its nearest neighboor in the original image.
+            double mappedRow = round(row * widthRatio);
+            double mappedCol = round(col * heightRatio);
+            for (int channel = 0; channel < newImage.channels; ++channel) {
+                newImage(row, col, channel) = image(mappedRow, mappedCol, channel);
+            }
+        }
+    }
+    // Store the resized image in the original variable to be able to retrieve it in the menus.
+    image = newImage;
 }
