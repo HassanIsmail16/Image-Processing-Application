@@ -40,6 +40,9 @@ void mergeFilter(Image &image);
 void flipImageHorizontally(Image &image);
 void flipImageVertically(Image &image);
 
+// Rotate Image
+void rotate90 (Image &image);
+
 int main() {
     // Display Header
     cout << "---------------------------------------" << el
@@ -144,7 +147,35 @@ void filterSelection() {
                 break;
             }
             case 6: {
-                // Rotation Filter
+                cout << "Please select the angle of rotation:" << el
+                     << "1) 90°" << el
+                     << "2) 180°" << el
+                     << "3) 270°" << el;
+
+                int rotationChoice;
+                cin >> rotationChoice;
+                cin.clear();
+                cin.ignore();
+
+                switch (rotationChoice) {
+                    case 1: {
+                        rotate90(image);
+                        image.loadNewImage("temp.png", 0);
+                        break;
+                    }
+                    case 2: {
+                        // 180
+                        break;
+                    }
+                    case 3: {
+                        // 270
+                        break;
+                    }
+                    default: {
+                        cout << "Invalid choice. Returning to main menu..." << el;
+                        break;
+                    }
+                }
                 break;
             }
             case 7: {
@@ -287,4 +318,17 @@ void flipImageVertically(Image &image){
             }
         }
     }
+}
+
+// Rotate Image
+void rotate90 (Image &image) {
+    Image result(image.width, image.height);
+    for (int row = 0; row < image.height; row++) {
+        for (int col = 0; col < image.width; col++) {
+            for (int channel = 0; channel < image.channels; channel++) {
+                result(col, image.height - row - 1, channel) = image(row, col, channel);
+            }
+        }
+    }
+    result.saveImage("temp.png");
 }
