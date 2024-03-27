@@ -41,11 +41,18 @@ void mergeFilter(Image &image);
 void flipImageHorizontally(Image &image);
 void flipImageVertically(Image &image);
 
+// Image Rotation
+void rotate90(Image &image);
+void rotate180(Image &image);
+void rotate270(Image &image);
+
 // Darken and Lighten Image
 void darkFilter(Image &image);
 void lightFilter(Image &image);
 
 int main() {
+    Image image("luffy.jpg");
+    rotate90(image);
     // Display Header
     cout << "---------------------------------------" << el
          << "   " << "Mini Photoshop for Photo Editing!" << "   " << el
@@ -100,7 +107,7 @@ Image imageInput() {
         // File name input
         cin >> imageName;
         try {
-            image.loadNewImage(imageName);
+            image.loadNewImage(imageName, 3);
             cout << "Image Loaded Successfully." << el;
             cout << "-------------------------------------" << el;
             break;
@@ -112,7 +119,7 @@ Image imageInput() {
     }
 
     // Main image loading
-    image.loadNewImage(imageName);
+    image.loadNewImage(imageName, 3);
     return image;
 }
 
@@ -173,7 +180,7 @@ void filterSelection() {
                 cout << "Please select one of the following choices:" << el
                      << "1) Flip Horizontally " << el
                      << "2) Flip Vertically" << el;
-                
+
                 int intFlipChoice;
                 string flipChoice;
                 cin >> flipChoice;
@@ -203,7 +210,34 @@ void filterSelection() {
                 break;
             }
             case 6: {
-                // Rotation Filter
+                cout << "Please select the angle of rotation:" << el
+                     << "1) 90°" << el
+                     << "2) 180°" << el
+                     << "3) 270°" << el;
+
+                int rotationChoice;
+                cin >> rotationChoice;
+                cin.clear();
+                cin.ignore();
+
+                switch (rotationChoice) {
+                    case 1: {
+                        rotate90(image);
+                        break;
+                    }
+                    case 2: {
+                        rotate180(image);
+                        break;
+                    }
+                    case 3: {
+                        rotate270(image);
+                        break;
+                    }
+                    default: {
+                        cout << "Invalid choice. Returning to main menu..." << el;
+                        break;
+                    }
+                }
                 break;
             }
             case 7: {
@@ -416,6 +450,32 @@ void flipImageVertically(Image &image){
     }
 }
 
+// Rotate Image
+void rotate90(Image &image) {
+    Image result(image.height, image.width);
+    for (int row = 0; row < image.height; row++) {
+        for (int col = 0; col < image.width; col++) {
+            for (int channel = 0; channel < image.channels; channel++) {
+                result(row, col, channel) = image(col, row, channel);
+            }
+        }
+    }
+    flipImageHorizontally(result);
+    result.saveImage("temp.png");
+    image.loadNewImage("temp.png", 3);
+}
+
+void rotate180(Image &image) {
+    flipImageVertically(image);
+    flipImageHorizontally(image);
+}
+
+void rotate270(Image &image) {
+    rotate90(image);
+    flipImageHorizontally(image);
+    flipImageVertically(image);
+}
+
 // Darken and Lighten Image
 void darkFilter(Image &image) {
     int dark;
@@ -432,6 +492,7 @@ void darkFilter(Image &image) {
         }
     }
 }
+
 void lightFilter(Image &image){
     int light;
 
