@@ -65,7 +65,7 @@ int main() {
         if (isInteger(choice)) {
             intChoice = stoi(choice);
         } else {
-            cerr << "Invalid Choice. Please select 1 or 2..." << el;
+            cout << "Invalid Choice. Please select 1 or 2..." << el;
             cout << "-------------------------------------" << el;
             continue;
         }
@@ -78,7 +78,7 @@ int main() {
                 cout << "Exiting the program..." << el;
                 return 0;
             default:
-                cerr << "Invalid Choice. Please select 1 or 2..." << el;
+                cout << "Invalid Choice. Please select 1 or 2..." << el;
                 cout << "-------------------------------------" << el;
         }
     }
@@ -105,7 +105,7 @@ Image imageInput() {
             cout << "-------------------------------------" << el;
             break;
         } catch (invalid_argument &exception){
-            cerr << exception.what() << el;
+            cout << exception.what() << el;
             cout << "-------------------------------------" << el;
             cout << "Please enter a valid image name..." << el;
         }
@@ -147,7 +147,7 @@ void filterSelection() {
         if (isInteger(choice)) {
             intChoice = stoi(choice);
         } else {
-            cerr << "Invalid Choice. Please select 1 or 2..." << el;
+            cout << "Invalid Choice. Please select 1 or 2..." << el;
             cout << "-------------------------------------" << el;
             continue;
         }
@@ -183,7 +183,7 @@ void filterSelection() {
                 if (isInteger(flipChoice)){
                     intFlipChoice = stoi(flipChoice);
                 } else {
-                    cerr << "Invalid Choice. Please select 1 or 2..." << el;
+                    cout << "Invalid Choice. Please select 1 or 2..." << el;
                     cout << "-------------------------------------" << el;
                     break;
                 }
@@ -196,7 +196,7 @@ void filterSelection() {
                         flipImageVertically(image);
                         break;
                     default:
-                        cerr << "Invalid Choice. Please select 1 or 2..." << el;
+                        cout << "Invalid Choice. Please select 1 or 2..." << el;
                         cout << "-------------------------------------" << el;
                         break;
                 }
@@ -220,7 +220,7 @@ void filterSelection() {
                 if (isInteger(DarkorLightChoice)){
                     intDarkorLightChoice = stoi(DarkorLightChoice);
                 } else {
-                    cerr << "Invalid Choice. Please select 1 or 2..." << el;
+                    cout << "Invalid Choice. Please select 1 or 2..." << el;
                     cout << "-------------------------------------" << el;
                     break;
                 }
@@ -233,7 +233,7 @@ void filterSelection() {
                         lightFilter(image);
                         break;
                     default:
-                        cerr << "Invalid Choice. Please select 1 or 2..." << el;
+                        cout << "Invalid Choice. Please select 1 or 2..." << el;
                         cout << "-------------------------------------" << el;
                         break;
                 }
@@ -270,7 +270,7 @@ void filterSelection() {
                 break;
             }
             default: {
-                cerr << "Invalid Choice. Please select a number between 1 & 8..." << el;
+                cout << "Invalid Choice. Please select a number between 1 & 8..." << el;
                 cout << "-------------------------------------" << el;
             }
         }
@@ -298,7 +298,7 @@ string saveImage(Image &image) {
         return "Save Current";
     }
     catch(invalid_argument &exception){
-        cerr << exception.what() << el;
+        cout << exception.what() << el;
         cout << "-------------------------------------" << el;
         return "Not Saved";
     }
