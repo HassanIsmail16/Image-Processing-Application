@@ -141,7 +141,7 @@ void filterSelection() {
              << "8) Crop Images" << "(NOT ADDED YET)" << space << el
              << "9) Adding a Frame to the Picture" << space << "(NOT ADDED YET)" << el
              << "10) Detect Image Edges" << space << "(NOT ADDED YET)" << el
-             << "11) Resizing Images" << space << "(NOT ADDED YET)" << el
+             << "11) Resizing Images" << el
              << "12) Blur Images" << space << "(NOT ADDED YET)" << el
              << "13) Save current Image" << el
              << "14) Return to previous menu" << space << "(UNSAVED CHANGES WILL BE LOST)" << el;
