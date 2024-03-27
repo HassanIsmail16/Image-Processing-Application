@@ -466,8 +466,7 @@ void rotate90(Image &image) {
         }
     }
     flipImageHorizontally(result);
-    result.saveImage("temp.png");
-    image.loadNewImage("temp.png");
+    image = result;
 }
 
 void rotate180(Image &image) {
