@@ -76,15 +76,32 @@ int main() {
 
 // General Helper Functions
 Image imageInput() {
-    // File name input
+    // Input prompt
     cout << "Insert an image name with the extension (.g img.png)" << el
          << "Allowed extensions are .png, .bmp, .tga, .jpg" << el;
 
+    // Initialize variables
     string imageName;
-    cin >> imageName;
+    Image image;
+
+    // Exception handling loop.
+    while (true) {
+        // File name input
+        cin >> imageName;
+        try {
+            image.loadNewImage(imageName);
+            cout << "Image Loaded Successfully." << el;
+            cout << "-------------------------------------" << el;
+            break;
+        } catch (invalid_argument exception){
+            cerr << exception.what() << el;
+            cout << "-------------------------------------" << el;
+            cout << "Please enter a valid image name..." << el;
+        }
+    }
 
     // Main image loading
-    Image image(imageName);
+    image.loadNewImage(imageName);
     return image;
 }
 
@@ -224,10 +241,18 @@ string saveImage(Image &image) {
     string saveName;
     cin >> saveName;
 
-    // Image saving
-    image.saveImage(saveName);
-
-    return "Save Current";
+    try{
+        // Image saving
+        image.saveImage(saveName);
+        cout << "Image Saved Successfully." << el;
+        cout << "-------------------------------------" << el;
+        return "Save Current";
+    }
+    catch(invalid_argument exception){
+        cerr << exception.what() << el;
+        cout << "-------------------------------------" << el;
+        return "Not Saved";
+    }
 }
 
 void copyImage(Image &source, Image &destination){
