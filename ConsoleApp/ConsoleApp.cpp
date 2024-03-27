@@ -183,7 +183,7 @@ void filterSelection() {
                 if (isInteger(flipChoice)){
                     intFlipChoice = stoi(flipChoice);
                 } else {
-                    cout << "Invalid Choice. Please select 1 or 2..." << el;
+                    cerr << "Invalid Choice. Please select 1 or 2..." << el;
                     cout << "-------------------------------------" << el;
                     break;
                 }
@@ -196,7 +196,8 @@ void filterSelection() {
                         flipImageVertically(image);
                         break;
                     default:
-                        cout << "Invalid Choice. Please select 1 or 2..." << el;
+                        cerr << "Invalid Choice. Please select 1 or 2..." << el;
+                        cout << "-------------------------------------" << el;
                         break;
                 }
                 break;
@@ -219,7 +220,7 @@ void filterSelection() {
                 if (isInteger(DarkorLightChoice)){
                     intDarkorLightChoice = stoi(DarkorLightChoice);
                 } else {
-                    cout << "Invalid Choice. Please select 1 or 2..." << el;
+                    cerr << "Invalid Choice. Please select 1 or 2..." << el;
                     cout << "-------------------------------------" << el;
                     break;
                 }
@@ -232,7 +233,8 @@ void filterSelection() {
                         lightFilter(image);
                         break;
                     default:
-                        cout << "Invalid Choice. Please select 1 or 2..." << el;
+                        cerr << "Invalid Choice. Please select 1 or 2..." << el;
+                        cout << "-------------------------------------" << el;
                         break;
                 }
                 break;
@@ -268,7 +270,8 @@ void filterSelection() {
                 break;
             }
             default: {
-                cout << "Invalid Choice. Please select a number between 1 & 8..." << el;
+                cerr << "Invalid Choice. Please select a number between 1 & 8..." << el;
+                cout << "-------------------------------------" << el;
             }
         }
     }
