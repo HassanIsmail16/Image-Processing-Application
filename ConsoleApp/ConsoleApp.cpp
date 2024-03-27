@@ -5,19 +5,6 @@
 
 using namespace std;
 
-/*
-- Image (class)  `Image varName("image.png")` for loading images
-- `image.saveImage("newFilename.png")` for saving images
-- `image(x, y, channel)` for accessing RGB values
-- `Image varName(width, height)` for creating a blank image of width x height
-- `varName.loadNewImage("image.png")` to load an image into a blank image
-- `.loadNewImage()` and `.saveImage()` can also return booleans
-- `varName.setPixel(x, y, channel, value)`
-- `varName.getPixel(x, y, channel) = value`
-- `varName.width`, `varName.height`, `varName.channels`
- */
-
-
 // General Functions
 void filterSelection();
 string saveImage(Image &image);
@@ -51,8 +38,6 @@ void darkFilter(Image &image);
 void lightFilter(Image &image);
 
 int main() {
-    Image image("luffy.jpg");
-    rotate90(image);
     // Display Header
     cout << "---------------------------------------" << el
          << "   " << "Mini Photoshop for Photo Editing!" << "   " << el
@@ -63,12 +48,12 @@ int main() {
              << "1) Load an image " << el
              << "2) Exit the program" << el;
 
+        // Input
         int intChoice;
         string choice;
-        cin >> choice;
-        cin.clear();
-        cin.ignore();
 
+        // Input validation
+        getline(cin, choice);
         if (isInteger(choice)) {
             intChoice = stoi(choice);
         } else {
@@ -89,13 +74,12 @@ int main() {
                 cout << "-------------------------------------" << el;
         }
     }
-    return 0;
 }
 
 // General Helper Functions
 Image imageInput() {
     // Input prompt
-    cout << "Insert an image name with the extension (.g img.png)" << el
+    cout << "Insert an image name with the extension (e.g img.png)" << el
          << "Allowed extensions are .png, .bmp, .tga, .jpg" << el;
 
     // Initialize variables
@@ -105,7 +89,7 @@ Image imageInput() {
     // Exception handling loop.
     while (true) {
         // File name input
-        cin >> imageName;
+        getline(cin, imageName);
         try {
             image.loadNewImage(imageName, 3);
             cout << "Image Loaded Successfully." << el;
@@ -137,20 +121,20 @@ void filterSelection() {
              << "5) Flip Image" << el
              << "6) Rotate Image" << el
              << "7) Darken and Lighten Image" << el
-             << "8) Crop Images" << el
-             << "9) Adding a Frame to the Picture" << el
-             << "10) Detect Image Edges" << el
-             << "11) Resizing Images" << el
-             << "12) Blur Images" << el
+             << "8) Crop Images" << "(NOT ADDED YET)" << space << el
+             << "9) Adding a Frame to the Picture" << space << "(NOT ADDED YET)" << el
+             << "10) Detect Image Edges" << space << "(NOT ADDED YET)" << el
+             << "11) Resizing Images" << space << "(NOT ADDED YET)" << el
+             << "12) Blur Images" << space << "(NOT ADDED YET)" << el
              << "13) Save current Image" << el
-             << "14) Return to previous menu" << el;
+             << "14) Return to previous menu" << space << "(UNSAVED CHANGES WILL BE LOST)" << el;
 
+        // Input
         int intChoice;
         string choice;
-        cin >> choice;
-        cin.clear();
-        cin.ignore();
+        getline(cin, choice);
 
+        // Input validation
         if (isInteger(choice)) {
             intChoice = stoi(choice);
         } else {
@@ -181,12 +165,12 @@ void filterSelection() {
                      << "1) Flip Horizontally " << el
                      << "2) Flip Vertically" << el;
 
+                // Input
                 int intFlipChoice;
                 string flipChoice;
-                cin >> flipChoice;
-                cin.clear();
-                cin.ignore();
+                getline(cin, flipChoice);
 
+                // Input validation
                 if (isInteger(flipChoice)){
                     intFlipChoice = stoi(flipChoice);
                 } else {
@@ -211,32 +195,36 @@ void filterSelection() {
             }
             case 6: {
                 cout << "Please select the angle of rotation:" << el
-                     << "1) 90°" << el
-                     << "2) 180°" << el
-                     << "3) 270°" << el;
+                     << "1) 90" << el
+                     << "2) 180" << el
+                     << "3) 270" << el;
 
-                int rotationChoice;
-                cin >> rotationChoice;
-                cin.clear();
-                cin.ignore();
+                // Input
+                int intRotationChoice;
+                string rotationChoice;
+                getline(cin, rotationChoice);
 
-                switch (rotationChoice) {
-                    case 1: {
+                // Input validation
+                if (isInteger(rotationChoice) && stoi(rotationChoice) >= 1 && stoi(rotationChoice) <= 3) {
+                    intRotationChoice = stoi(rotationChoice);
+                } else {
+                    cout << "Invalid input. Please select an integer between 1 and 3..." << el;
+                    cout << "-------------------------------------" << el;
+                    continue;
+                }
+
+                switch (intRotationChoice) {
+                    case 1:
                         rotate90(image);
                         break;
-                    }
-                    case 2: {
+                    case 2:
                         rotate180(image);
                         break;
-                    }
-                    case 3: {
+                    case 3:
                         rotate270(image);
                         break;
-                    }
-                    default: {
-                        cout << "Invalid choice. Returning to main menu..." << el;
+                    default:
                         break;
-                    }
                 }
                 break;
             }
@@ -245,12 +233,12 @@ void filterSelection() {
                      << "1) Darken Image" << el
                      << "2) Lighten Image" << el;
 
+                // Input
                 int intDarkorLightChoice;
                 string DarkorLightChoice;
-                cin >> DarkorLightChoice;
-                cin.clear();
-                cin.ignore();
+                getline(cin, DarkorLightChoice);
 
+                // Input validation
                 if (isInteger(DarkorLightChoice)){
                     intDarkorLightChoice = stoi(DarkorLightChoice);
                 } else {
@@ -322,7 +310,7 @@ string saveImage(Image &image) {
     cout << "Enter the name of the new image with the extension (e.g img.png):" << el;
 
     string saveName;
-    cin >> saveName;
+    getline(cin, saveName);
 
     try{
         // Image saving
@@ -350,6 +338,7 @@ void copyImage(Image &source, Image &destination){
 
 // GrayScale Filter
 void GSfilter(Image &image){
+    // Puts the same values (average) in all channels in one pixel
     for(int i = 0; i < image.width; ++i){
         for(int j = 0; j < image.height; ++j){
             unsigned int avg = 0;
@@ -390,6 +379,7 @@ void blackAndWhiteFilter(Image &image){
 
 // Image Inversion Filter
 void invertImage(Image &image) {
+    // Subtracts the current channel value from 255
     for (int x = 0; x < image.width; x++) {
         for (int y = 0; y < image.height; y++) {
             for (int channel = 0; channel < image.channels; channel++) {
@@ -402,11 +392,11 @@ void invertImage(Image &image) {
 // Merge Filter
 void mergeFilter(Image &image) {
     cout << "Insert a second image to merge" << el;
-    string imgName; cin >> imgName;
-    Image imageToMegre(imgName);
+    Image imageToMegre = imageInput();
 
     unsigned int merge = 0;
 
+    // Averages each two corresponding pixels from the two images
     if (image.width == imageToMegre.width && image.height == imageToMegre.height) {
         for (int i = 0; i < image.width; ++i) {
             for (int j = 0; j < image.height; ++j) {
@@ -452,6 +442,7 @@ void flipImageVertically(Image &image){
 
 // Rotate Image
 void rotate90(Image &image) {
+    // Rotates the image using the flipping and a specific traversal pattern
     Image result(image.height, image.width);
     for (int row = 0; row < image.height; row++) {
         for (int col = 0; col < image.width; col++) {
@@ -466,14 +457,15 @@ void rotate90(Image &image) {
 }
 
 void rotate180(Image &image) {
+    // Flips the image two times to rotate by 180 degrees
     flipImageVertically(image);
     flipImageHorizontally(image);
 }
 
 void rotate270(Image &image) {
+    // Rotates it 180 + 90 to get 270 rotation
+    rotate180(image);
     rotate90(image);
-    flipImageHorizontally(image);
-    flipImageVertically(image);
 }
 
 // Darken and Lighten Image
