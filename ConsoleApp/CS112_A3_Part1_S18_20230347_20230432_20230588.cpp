@@ -51,6 +51,9 @@ void rotate270(Image &image);
 void darkFilter(Image &image);
 void lightFilter(Image &image);
 
+// Edge Filter
+void edgeFilter(Image &image);
+
 // Resize Images
 void resizeImage(Image &image, int newWidth, int newHeight);
 
@@ -140,7 +143,7 @@ void filterSelection() {
              << "7) Darken and Lighten Image" << el
              << "8) Crop Images" << "(NOT ADDED YET)" << space << el
              << "9) Adding a Frame to the Picture" << space << "(NOT ADDED YET)" << el
-             << "10) Detect Image Edges" << space << "(NOT ADDED YET)" << el
+             << "10) Detect Image Edges" << el
              << "11) Resizing Images" << el
              << "12) Blur Images" << space << "(NOT ADDED YET)" << el
              << "13) Save current Image" << el
@@ -287,7 +290,8 @@ void filterSelection() {
                 break;
             }
             case 10: {
-                // Detect Image Edges
+                blackAndWhiteFilter(image);
+                edgeFilter(image);
                 break;
             }
             case 11: {
@@ -528,6 +532,22 @@ void lightFilter(Image &image){
                     image(i, j, k) += light / 2;
                 else
                     image(i,j,k) = 255;
+            }
+        }
+    }
+}
+
+// Edge Filter
+void edgeFilter(Image &image){
+    for (int i = 0; i < image.width - 1; ++i) {
+        for (int j = 0; j < image.height - 1; ++j) {
+            for (int k = 0; k < 3; ++k) {
+                if (abs(image(i + 1, j + 1, k) - image(i, j, k)) > 49) {
+                    image(i, j, k) = 0;
+                }
+                else {
+                    image(i, j, k) = 255;
+                }
             }
         }
     }
