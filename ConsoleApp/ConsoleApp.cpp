@@ -117,7 +117,7 @@ void filterSelection() {
              << "1) Grayscale Conversion" << el
              << "2) Black and White" << el
              << "3) Invert Image" << el
-             << "4) Merge Images" << el
+             << "4) Merge Images" << space << "(NOT COMPLETE)" << el
              << "5) Flip Image" << el
              << "6) Rotate Image" << el
              << "7) Darken and Lighten Image" << el
