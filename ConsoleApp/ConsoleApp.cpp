@@ -23,6 +23,7 @@ void filterSelection();
 string saveImage(Image &image);
 Image imageInput();
 void copyImage(Image &source, Image &destination);
+bool isInteger(const string& input);
 
 // GrayScale Filtering
 void GSfilter(Image &image);
@@ -40,8 +41,9 @@ void mergeFilter(Image &image);
 void flipImageHorizontally(Image &image);
 void flipImageVertically(Image &image);
 
-// Rotate Image
-void rotate90 (Image &image);
+// Darken and Lighten Image
+void darkFilter(Image &image);
+void lightFilter(Image &image);
 
 int main() {
     // Display Header
@@ -54,12 +56,21 @@ int main() {
              << "1) Load an image " << el
              << "2) Exit the program" << el;
 
-        int choice;
+        int intChoice;
+        string choice;
         cin >> choice;
         cin.clear();
         cin.ignore();
 
-        switch (choice) {
+        if (isInteger(choice)) {
+            intChoice = stoi(choice);
+        } else {
+            cout << "Invalid Choice. Please select 1 or 2..." << el;
+            cout << "-------------------------------------" << el;
+            continue;
+        }
+
+        switch (intChoice) {
             case 1:
                 filterSelection();
                 break;
@@ -68,6 +79,7 @@ int main() {
                 return 0;
             default:
                 cout << "Invalid Choice. Please select 1 or 2..." << el;
+                cout << "-------------------------------------" << el;
         }
     }
     return 0;
@@ -75,15 +87,32 @@ int main() {
 
 // General Helper Functions
 Image imageInput() {
-    // File name input
+    // Input prompt
     cout << "Insert an image name with the extension (.g img.png)" << el
          << "Allowed extensions are .png, .bmp, .tga, .jpg" << el;
 
+    // Initialize variables
     string imageName;
-    cin >> imageName;
+    Image image;
+
+    // Exception handling loop.
+    while (true) {
+        // File name input
+        cin >> imageName;
+        try {
+            image.loadNewImage(imageName);
+            cout << "Image Loaded Successfully." << el;
+            cout << "-------------------------------------" << el;
+            break;
+        } catch (invalid_argument &exception){
+            cout << exception.what() << el;
+            cout << "-------------------------------------" << el;
+            cout << "Please enter a valid image name..." << el;
+        }
+    }
 
     // Main image loading
-    Image image(imageName);
+    image.loadNewImage(imageName);
     return image;
 }
 
@@ -100,13 +129,30 @@ void filterSelection() {
              << "4) Merge Images" << el
              << "5) Flip Image" << el
              << "6) Rotate Image" << el
-             << "7) Save current Image" << el
-             << "8) Return to previous menu" << el;
+             << "7) Darken and Lighten Image" << el
+             << "8) Crop Images" << el
+             << "9) Adding a Frame to the Picture" << el
+             << "10) Detect Image Edges" << el
+             << "11) Resizing Images" << el
+             << "12) Blur Images" << el
+             << "13) Save current Image" << el
+             << "14) Return to previous menu" << el;
 
-        int choice;
+        int intChoice;
+        string choice;
         cin >> choice;
+        cin.clear();
+        cin.ignore();
 
-        switch (choice) {
+        if (isInteger(choice)) {
+            intChoice = stoi(choice);
+        } else {
+            cout << "Invalid Choice. Please select 1 or 2..." << el;
+            cout << "-------------------------------------" << el;
+            continue;
+        }
+
+        switch (intChoice) {
             case 1: {
                 GSfilter(image);
                 break;
@@ -128,12 +174,21 @@ void filterSelection() {
                      << "1) Flip Horizontally " << el
                      << "2) Flip Vertically" << el;
                 
-                int flipChoice;
+                int intFlipChoice;
+                string flipChoice;
                 cin >> flipChoice;
                 cin.clear();
                 cin.ignore();
 
-                switch (flipChoice) {
+                if (isInteger(flipChoice)){
+                    intFlipChoice = stoi(flipChoice);
+                } else {
+                    cout << "Invalid Choice. Please select 1 or 2..." << el;
+                    cout << "-------------------------------------" << el;
+                    break;
+                }
+
+                switch (intFlipChoice) {
                     case 1:
                         flipImageHorizontally(image);
                         break;
@@ -142,6 +197,7 @@ void filterSelection() {
                         break;
                     default:
                         cout << "Invalid Choice. Please select 1 or 2..." << el;
+                        cout << "-------------------------------------" << el;
                         break;
                 }
                 break;
@@ -179,20 +235,80 @@ void filterSelection() {
                 break;
             }
             case 7: {
+                cout << "Please select one of the following choices:" << el
+                     << "1) Darken Image" << el
+                     << "2) Lighten Image" << el;
+
+                int intDarkorLightChoice;
+                string DarkorLightChoice;
+                cin >> DarkorLightChoice;
+                cin.clear();
+                cin.ignore();
+
+                if (isInteger(DarkorLightChoice)){
+                    intDarkorLightChoice = stoi(DarkorLightChoice);
+                } else {
+                    cout << "Invalid Choice. Please select 1 or 2..." << el;
+                    cout << "-------------------------------------" << el;
+                    break;
+                }
+
+                switch (intDarkorLightChoice) {
+                    case 1:
+                        darkFilter(image);
+                        break;
+                    case 2:
+                        lightFilter(image);
+                        break;
+                    default:
+                        cout << "Invalid Choice. Please select 1 or 2..." << el;
+                        cout << "-------------------------------------" << el;
+                        break;
+                }
+                break;
+            }
+            case 8: {
+                // Crop Images
+                break;
+            }
+            case 9: {
+                // Aِdding a Frame to the Picture
+                break;
+            }
+            case 10: {
+                // Detect Image Edges
+                break;
+            }
+            case 11: {
+                // Resizing Images
+                break;
+            }
+            case 12: {
+                // Blur Images
+                break;
+            }
+            case 13: {
                 saveImage(image);
                 loopStatus = false;
                 break;
             }
-            case 8: {
+            case 14: {
                 cout << "Returning to previous menu... " << el;
                 loopStatus = false;
                 break;
             }
             default: {
                 cout << "Invalid Choice. Please select a number between 1 & 8..." << el;
+                cout << "-------------------------------------" << el;
             }
         }
     }
+}
+
+bool isInteger(const string& input){
+
+    regex integer(R"(\d+)");
+    return regex_match(input, integer);
 }
 
 string saveImage(Image &image) {
@@ -202,10 +318,18 @@ string saveImage(Image &image) {
     string saveName;
     cin >> saveName;
 
-    // Image saving
-    image.saveImage(saveName);
-
-    return "Save Current";
+    try{
+        // Image saving
+        image.saveImage(saveName);
+        cout << "Image Saved Successfully." << el;
+        cout << "-------------------------------------" << el;
+        return "Save Current";
+    }
+    catch(invalid_argument &exception){
+        cout << exception.what() << el;
+        cout << "-------------------------------------" << el;
+        return "Not Saved";
+    }
 }
 
 void copyImage(Image &source, Image &destination){
@@ -320,15 +444,35 @@ void flipImageVertically(Image &image){
     }
 }
 
-// Rotate Image
-void rotate90 (Image &image) {
-    Image result(image.width, image.height);
-    for (int row = 0; row < image.height; row++) {
-        for (int col = 0; col < image.width; col++) {
-            for (int channel = 0; channel < image.channels; channel++) {
-                result(col, image.height - row - 1, channel) = image(row, col, channel);
+// Darken and Lighten Image
+void darkFilter(Image &image) {
+    int dark;
+
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            for (int k = 0; k < 3; ++k) {
+                dark = image(i, j, k);
+                if (image(i, j, k) > dark / 2)
+                    image(i, j, k) -= dark / 2;
+                else
+                    image(i, j, k) = 0;
             }
         }
     }
-    result.saveImage("temp.png");
+}
+
+void lightFilter(Image &image){
+    int light;
+
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            for (int k = 0; k < 3; ++k) {
+                light = image(i, j, k);
+                if(image(i,j,k) + (light / 2) < 255)
+                    image(i, j, k) += light / 2;
+                else
+                    image(i,j,k) = 255;
+            }
+        }
+    }
 }
