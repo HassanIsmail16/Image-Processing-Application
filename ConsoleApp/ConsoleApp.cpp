@@ -23,6 +23,7 @@ void filterSelection();
 string saveImage(Image &image);
 Image imageInput();
 void copyImage(Image &source, Image &destination);
+bool isInteger(const string& input);
 
 // GrayScale Filtering
 void GSfilter(Image &image);
@@ -55,12 +56,21 @@ int main() {
              << "1) Load an image " << el
              << "2) Exit the program" << el;
 
-        int choice;
+        int intChoice;
+        string choice;
         cin >> choice;
         cin.clear();
         cin.ignore();
 
-        switch (choice) {
+        if (isInteger(choice)) {
+            intChoice = stoi(choice);
+        } else {
+            cerr << "Invalid Choice. Please select 1 or 2..." << el;
+            cout << "-------------------------------------" << el;
+            continue;
+        }
+
+        switch (intChoice) {
             case 1:
                 filterSelection();
                 break;
@@ -68,7 +78,8 @@ int main() {
                 cout << "Exiting the program..." << el;
                 return 0;
             default:
-                cout << "Invalid Choice. Please select 1 or 2..." << el;
+                cerr << "Invalid Choice. Please select 1 or 2..." << el;
+                cout << "-------------------------------------" << el;
         }
     }
     return 0;
@@ -93,7 +104,7 @@ Image imageInput() {
             cout << "Image Loaded Successfully." << el;
             cout << "-------------------------------------" << el;
             break;
-        } catch (invalid_argument exception){
+        } catch (invalid_argument &exception){
             cerr << exception.what() << el;
             cout << "-------------------------------------" << el;
             cout << "Please enter a valid image name..." << el;
@@ -127,10 +138,21 @@ void filterSelection() {
              << "13) Save current Image" << el
              << "14) Return to previous menu" << el;
 
-        int choice;
+        int intChoice;
+        string choice;
         cin >> choice;
+        cin.clear();
+        cin.ignore();
 
-        switch (choice) {
+        if (isInteger(choice)) {
+            intChoice = stoi(choice);
+        } else {
+            cerr << "Invalid Choice. Please select 1 or 2..." << el;
+            cout << "-------------------------------------" << el;
+            continue;
+        }
+
+        switch (intChoice) {
             case 1: {
                 GSfilter(image);
                 break;
@@ -152,12 +174,21 @@ void filterSelection() {
                      << "1) Flip Horizontally " << el
                      << "2) Flip Vertically" << el;
                 
-                int flipChoice;
+                int intFlipChoice;
+                string flipChoice;
                 cin >> flipChoice;
                 cin.clear();
                 cin.ignore();
 
-                switch (flipChoice) {
+                if (isInteger(flipChoice)){
+                    intFlipChoice = stoi(flipChoice);
+                } else {
+                    cout << "Invalid Choice. Please select 1 or 2..." << el;
+                    cout << "-------------------------------------" << el;
+                    break;
+                }
+
+                switch (intFlipChoice) {
                     case 1:
                         flipImageHorizontally(image);
                         break;
@@ -179,12 +210,21 @@ void filterSelection() {
                      << "1) Darken Image" << el
                      << "2) Lighten Image" << el;
 
-                int DarkorLightChoice;
+                int intDarkorLightChoice;
+                string DarkorLightChoice;
                 cin >> DarkorLightChoice;
                 cin.clear();
                 cin.ignore();
 
-                switch (DarkorLightChoice) {
+                if (isInteger(DarkorLightChoice)){
+                    intDarkorLightChoice = stoi(DarkorLightChoice);
+                } else {
+                    cout << "Invalid Choice. Please select 1 or 2..." << el;
+                    cout << "-------------------------------------" << el;
+                    break;
+                }
+
+                switch (intDarkorLightChoice) {
                     case 1:
                         darkFilter(image);
                         break;
@@ -234,6 +274,12 @@ void filterSelection() {
     }
 }
 
+bool isInteger(const string& input){
+
+    regex integer(R"(\d+)");
+    return regex_match(input, integer);
+}
+
 string saveImage(Image &image) {
     // New file name input
     cout << "Enter the name of the new image with the extension (e.g img.png):" << el;
@@ -248,7 +294,7 @@ string saveImage(Image &image) {
         cout << "-------------------------------------" << el;
         return "Save Current";
     }
-    catch(invalid_argument exception){
+    catch(invalid_argument &exception){
         cerr << exception.what() << el;
         cout << "-------------------------------------" << el;
         return "Not Saved";
