@@ -8,9 +8,9 @@ Author2 (name - ID - Group - Section - Email):	Momen Abd El-Kader Abd El-Naby Ab
 Author3 (name - ID - Group - Section - Email):	Mohamed Ali Hassan Amin                     20230347 B S18  11410120230347@stud.cu.edu.eg
 Teaching Assistant:		    Ahmed Foad Lotfy
 Who did what:
-    Hassan Ali:         Main Menu, Image Input Function, Image Save Function, Filter Selection Function, Invert Image Filter, Image Rotation Filters.
-    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter.
-    Mohamed Ali:        Grayscale Filter, Merge Image Filter (INCOMPLETE), Lighten & Darken Image Filters.
+    Hassan Ali:         Main Menu, Image Input Function, Image Save Function, Filter Selection Function, Invert Image Filter, Image Rotation Filters, Frame Filter.
+    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter, Resize Filter.
+    Mohamed Ali:        Grayscale Filter, Merge Image Filter (INCOMPLETE), Lighten & Darken Image Filters, Edge Detection Filter.
  */
 #include <bits/stdc++.h>
 #include "../../Image_Class.h"
@@ -783,8 +783,8 @@ void resizeImage(Image &image, int newWidth, int newHeight){
     for (int row = 0; row < newImage.width; ++row) {
         for (int col = 0; col < newImage.height; ++col) {
             // Map each pixel in the resized image to its nearest neighboor in the original image.
-            double mappedRow = round(row * widthRatio);
-            double mappedCol = round(col * heightRatio);
+            double mappedRow = floor(row * widthRatio);
+            double mappedCol = floor(col * heightRatio);
             for (int channel = 0; channel < newImage.channels; ++channel) {
                 newImage(row, col, channel) = image(mappedRow, mappedCol, channel);
             }
