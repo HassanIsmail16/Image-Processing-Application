@@ -21,6 +21,7 @@ using namespace std;
 
 // General Functions
 void filterSelection();
+int returnMenu();
 string saveImage(Image &image);
 Image imageInput();
 void copyImage(Image &source, Image &destination);
@@ -51,6 +52,14 @@ void rotate270(Image &image);
 void darkFilter(Image &image);
 void lightFilter(Image &image);
 
+// Frame Filter
+pair <int, vector <int>> frameConfiguration(Image &image);
+int frameSizeConfiguration(Image &image);
+vector <int> frameColorConfiguration(Image &image);
+bool hexCodeValidation(string hexCode);
+int hexConversion(string code);
+void frameFilter(Image &image, pair <int, vector <int>> configuration);
+
 // Edge Filter
 void edgeFilter(Image &image);
 
@@ -74,7 +83,7 @@ int main() {
 
         // Input validation
         getline(cin, choice);
-        if (isInteger(choice)) {
+        if (isInteger(choice) && (stoi(choice) == 1 || stoi(choice) == 2)) {
             intChoice = stoi(choice);
         } else {
             cout << "Invalid Choice. Please select 1 or 2..." << el;
@@ -142,12 +151,12 @@ void filterSelection() {
              << "6) Rotate Image" << el
              << "7) Darken and Lighten Image" << el
              << "8) Crop Images" << "(NOT ADDED YET)" << space << el
-             << "9) Adding a Frame to the Picture" << space << "(NOT ADDED YET)" << el
+             << "9) Adding a Frame to the Picture" << el
              << "10) Detect Image Edges" << el
              << "11) Resizing Images" << el
              << "12) Blur Images" << space << "(NOT ADDED YET)" << el
              << "13) Save current Image" << el
-             << "14) Return to previous menu" << space << "(UNSAVED CHANGES WILL BE LOST)" << el;
+             << "14) Return to previous menu" << el;
 
         // Input
         int intChoice;
@@ -286,7 +295,7 @@ void filterSelection() {
                 break;
             }
             case 9: {
-                // Aِdding a Frame to the Picture
+                frameFilter(image, frameConfiguration(image));
                 break;
             }
             case 10: {
@@ -324,7 +333,11 @@ void filterSelection() {
                 break;
             }
             case 14: {
-                cout << "Returning to previous menu... " << el;
+                if (returnMenu() == 1) {
+                    saveImage(image);
+                } else {
+                    cout << "Returning to previous menu... " << el;
+                }
                 loopStatus = false;
                 break;
             }
@@ -337,9 +350,30 @@ void filterSelection() {
 }
 
 bool isInteger(const string& input){
-
     regex integer(R"(\d+)");
     return regex_match(input, integer);
+}
+
+int returnMenu() {
+    // User prompt
+    cout << "Select one of the following choices:" << el
+         << "1) Save current photo then return to previous menu." << el
+         << "2) Return without saving." << el;
+
+    // Choice input
+    string choice;
+    int intChoice;
+    getline(cin, choice);
+
+    // Choice validation
+    if (isInteger(choice) && (stoi(choice) == 1 || stoi(choice) == 2)) {
+        intChoice = stoi(choice);
+        return intChoice;
+    } else {
+        cout << "Invalid Choice. Please select 1 or 2..." << el;
+        cout << "-------------------------------------" << el;
+        return returnMenu();
+    }
 }
 
 string saveImage(Image &image) {
@@ -532,6 +566,190 @@ void lightFilter(Image &image){
                     image(i, j, k) += light / 2;
                 else
                     image(i,j,k) = 255;
+            }
+        }
+    }
+}
+
+// Frame Filter
+pair <int, vector <int>> frameConfiguration(Image &image) {
+    while (true) {
+        // Frame size
+        int frameSize = frameSizeConfiguration(image);
+
+        // Frame color
+        vector <int> color = frameColorConfiguration(image);
+
+        // Repeats the configuration process if user chooses to return to the size configuration menu
+        if (color[0] == color[1] && color[1] == color[2] && color[2] == -1) {
+            continue;
+        } else { // Returns current configuration if everything goes smoothly
+            return {frameSize, color};
+        }
+    }
+}
+
+int frameSizeConfiguration(Image &image) {
+    // Frame size configuration prompt
+    cout << "Please enter the size of your frame (Note that maximum frame size of for your photo is "
+         << min(image.width, image.height) / 2 << "px)" << el;
+
+    string frameSize;
+    int intFrameSize;
+
+    getline(cin, frameSize);
+
+    // Size input validation
+    if (isInteger(frameSize)) {
+        intFrameSize = stoi(frameSize);
+        if (intFrameSize > 0) {
+            if (intFrameSize <= min(image.width, image.height) / 2) {
+                return intFrameSize;
+            } else {
+                cout << "Invalid input (MAXIMUM SIZE IS " << min(image.width, image.height) / 2 << "px)." << el;
+                return frameSizeConfiguration(image);
+            }
+        } else {
+            cout << "Invalid input (NEGATIVE INTEGER)." << el;
+            return frameSizeConfiguration(image);
+        }
+    } else {
+        cout << "Invalid input (NOT AN INTEGER)." << el;
+        return frameSizeConfiguration(image);
+    }
+}
+
+vector <int> frameColorConfiguration(Image &image) {
+    // Frame color configuration prompt
+    cout << "Select one of the following color configurations for your frame:" << el
+         << "1) Red" << el
+         << "2) Orange" << el
+         << "3) Yellow" << el
+         << "4) Green" << el
+         << "5) Blue" << el
+         << "6) Violet" << el
+         << "7) Custom (Hex Code)" << el
+         << "8) Return to size configuration" << el;
+
+    string colorChoice;
+    int intColorChoice;
+
+    getline(cin, colorChoice);
+
+    // Choice validation
+    if (isInteger(colorChoice) && stoi(colorChoice) > 0 && stoi(colorChoice) < 9) {
+        intColorChoice = stoi(colorChoice);
+    } else {
+        cout << "Invalid choice. Please select an integer between 1 and 8 (inclusive)." << el;
+        return frameColorConfiguration(image);
+    }
+
+    vector <int> color;
+    switch (intColorChoice) {
+        case 1: {
+            color = {255, 0, 0};
+            return color;
+        }
+        case 2: {
+            color = {255, 165, 0};
+            return color;
+        }
+        case 3: {
+            color = {255, 255, 0};
+            return color;
+        }
+        case 4: {
+            color = {0, 255, 0};
+            return color;
+        }
+        case 5: {
+            color = {0, 0, 255};
+            return color;
+        }
+        case 6: {
+            color = {160, 32, 240};
+            return color;
+        }
+        case 7: {
+            // Hex color input prompt
+            cout << "Enter a 6 digit hex code for your desired color (e.g: 00FF00 - without the hash in the beginning - no spaces)." << el;
+
+            // Hex color input
+            string hexCode;
+            getline(cin, hexCode);
+
+            // Hex color input validation
+            if (hexCodeValidation(hexCode)) {
+                string currentCode;
+                // Takes each two characters and converts them into the corresponding RGB value
+                for (int i = 0, j = 0; i < 6; i++) {
+                    currentCode.push_back(hexCode[i]);
+                    if (currentCode.size() == 2) {
+                        color.push_back(hexConversion(currentCode));
+                        currentCode.clear();
+                        j++;
+                    }
+                }
+                return color;
+            }
+        }
+        case 8: {
+            cout << "Returning to size configuration menu..." << el;
+            return {-1, -1, -1};
+        }
+    }
+}
+
+bool hexCodeValidation(string hexCode) {
+    // Hexadecimal characters mapping
+    string hexChars = "0123456789ABCDEF";
+
+    // Validates that the hexCode lies within hexadecimal characters and contains no spaces or special characters
+    if (hexCode.size() == 6) {
+        for (auto code : hexCode) {
+            if (isalpha(code) || isdigit(code)) {
+                for (auto hexChar : hexChars) {
+                    if (toupper(code) == hexChar) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+    } else {
+        return false;
+    }
+}
+
+int hexConversion(string code) {
+    // Mapping hexadecimal characters
+    map <char, int> hexChars = {
+            {'0', 0}, {'1', 1}, {'2', 2}, {'3', 3}, {'4', 4},
+            {'5', 5}, {'6', 6}, {'7', 7}, {'8', 8}, {'9', 9},
+            {'A', 10}, {'B', 11}, {'C', 12}, {'D', 13}, {'E', 14}, {'F', 15}
+    };
+
+    // Converting the hex code snippet
+    return (hexChars[toupper(code[1])] + hexChars[toupper(code[0])] * 16);
+}
+
+void frameFilter(Image &image, pair <int, vector <int>> configuration) {
+    // Vertical Borders
+    for (int x = 0; x < image.width; x++) {
+        for (int y1 = 0, y2 = image.height - configuration.first; y1 < configuration.first; y1++, y2++) {
+            for (int channel = 0; channel < image.channels; channel++) {
+                image(x, y1, channel) = configuration.second[channel];
+                image(x, y2, channel) = configuration.second[channel];
+            }
+        }
+    }
+
+    // Horizontal Borders
+    for (int x1 = 0, x2 = image.width - configuration.first; x1 < configuration.first; x1++, x2++) {
+        for (int y = 0; y < image.height; y++) {
+            for (int channel = 0; channel < image.channels; channel++) {
+                image(x1, y, channel) = configuration.second[channel];
+                image(x2, y, channel) = configuration.second[channel];
             }
         }
     }
