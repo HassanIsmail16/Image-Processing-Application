@@ -12,6 +12,7 @@ Who did what:
     Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter, Resize Filter.
     Mohamed Ali:        Grayscale Filter, Merge Image Filter (INCOMPLETE), Lighten & Darken Image Filters, Edge Detection Filter.
  */
+
 #include <bits/stdc++.h>
 #include "../../Image_Class.h"
 #define el '\n'
@@ -26,6 +27,7 @@ string saveImage(Image &image);
 Image imageInput();
 void copyImage(Image &source, Image &destination);
 bool isInteger(const string& input);
+int choiceSelection(vector <int> range);
 
 // GrayScale Filtering
 void GSfilter(Image &image);
@@ -66,6 +68,9 @@ void edgeFilter(Image &image);
 // Resize Images
 void resizeImage(Image &image, int newWidth, int newHeight);
 
+// Blur Filter
+
+
 int main() {
     // Display Header
     cout << "---------------------------------------" << el
@@ -77,30 +82,22 @@ int main() {
              << "1) Load an image " << el
              << "2) Exit the program" << el;
 
-        // Input
-        int intChoice;
-        string choice;
+        int choice = choiceSelection({1, 2});
 
-        // Input validation
-        getline(cin, choice);
-        if (isInteger(choice) && (stoi(choice) == 1 || stoi(choice) == 2)) {
-            intChoice = stoi(choice);
+        if (choice) {
+            switch (choice) {
+                case 1:
+                    filterSelection();
+                    break;
+                case 2:
+                    cout << "Exiting the program..." << el;
+                    return 0;
+                default:
+                    break;
+            }
         } else {
             cout << "Invalid Choice. Please select 1 or 2..." << el;
             cout << "-------------------------------------" << el;
-            continue;
-        }
-
-        switch (intChoice) {
-            case 1:
-                filterSelection();
-                break;
-            case 2:
-                cout << "Exiting the program..." << el;
-                return 0;
-            default:
-                cout << "Invalid Choice. Please select 1 or 2..." << el;
-                cout << "-------------------------------------" << el;
         }
     }
 }
@@ -159,20 +156,14 @@ void filterSelection() {
              << "14) Return to previous menu" << el;
 
         // Input
-        int intChoice;
-        string choice;
-        getline(cin, choice);
+        int choice = choiceSelection({1, 14});
 
-        // Input validation
-        if (isInteger(choice)) {
-            intChoice = stoi(choice);
-        } else {
-            cout << "Invalid Choice. Please select 1 or 2..." << el;
-            cout << "-------------------------------------" << el;
+        if (!choice) {
+            cout << "Invalid choice. Please select a number between 1 and 14 (inclusive)..." << el;
             continue;
         }
 
-        switch (intChoice) {
+        switch (choice) {
             case 1: {
                 GSfilter(image);
                 break;
@@ -195,20 +186,15 @@ void filterSelection() {
                      << "2) Flip Vertically" << el;
 
                 // Input
-                int intFlipChoice;
-                string flipChoice;
-                getline(cin, flipChoice);
+                int flipChoice = choiceSelection({1, 2});
 
-                // Input validation
-                if (isInteger(flipChoice)){
-                    intFlipChoice = stoi(flipChoice);
-                } else {
+                if (!flipChoice) {
                     cout << "Invalid Choice. Please select 1 or 2..." << el;
                     cout << "-------------------------------------" << el;
-                    break;
+                    continue;
                 }
 
-                switch (intFlipChoice) {
+                switch (flipChoice) {
                     case 1:
                         flipImageHorizontally(image);
                         break;
@@ -216,8 +202,6 @@ void filterSelection() {
                         flipImageVertically(image);
                         break;
                     default:
-                        cout << "Invalid Choice. Please select 1 or 2..." << el;
-                        cout << "-------------------------------------" << el;
                         break;
                 }
                 break;
@@ -229,20 +213,15 @@ void filterSelection() {
                      << "3) 270" << el;
 
                 // Input
-                int intRotationChoice;
-                string rotationChoice;
-                getline(cin, rotationChoice);
+                int rotationChoice = choiceSelection({1, 3});
 
-                // Input validation
-                if (isInteger(rotationChoice) && stoi(rotationChoice) >= 1 && stoi(rotationChoice) <= 3) {
-                    intRotationChoice = stoi(rotationChoice);
-                } else {
+                if (!rotationChoice) {
                     cout << "Invalid input. Please select an integer between 1 and 3..." << el;
                     cout << "-------------------------------------" << el;
                     continue;
                 }
 
-                switch (intRotationChoice) {
+                switch (rotationChoice) {
                     case 1:
                         rotate90(image);
                         break;
@@ -263,20 +242,15 @@ void filterSelection() {
                      << "2) Lighten Image" << el;
 
                 // Input
-                int intDarkorLightChoice;
-                string DarkorLightChoice;
-                getline(cin, DarkorLightChoice);
+                int darkOrLightChoice = choiceSelection({1, 2});
 
-                // Input validation
-                if (isInteger(DarkorLightChoice)){
-                    intDarkorLightChoice = stoi(DarkorLightChoice);
-                } else {
+                if (!darkOrLightChoice) {
                     cout << "Invalid Choice. Please select 1 or 2..." << el;
                     cout << "-------------------------------------" << el;
-                    break;
+                    continue;
                 }
 
-                switch (intDarkorLightChoice) {
+                switch (darkOrLightChoice) {
                     case 1:
                         darkFilter(image);
                         break;
@@ -284,8 +258,6 @@ void filterSelection() {
                         lightFilter(image);
                         break;
                     default:
-                        cout << "Invalid Choice. Please select 1 or 2..." << el;
-                        cout << "-------------------------------------" << el;
                         break;
                 }
                 break;
@@ -342,8 +314,7 @@ void filterSelection() {
                 break;
             }
             default: {
-                cout << "Invalid Choice. Please select a number between 1 & 8..." << el;
-                cout << "-------------------------------------" << el;
+                break;
             }
         }
     }
@@ -361,19 +332,14 @@ int returnMenu() {
          << "2) Return without saving." << el;
 
     // Choice input
-    string choice;
-    int intChoice;
-    getline(cin, choice);
+    int choice = choiceSelection({1, 2});
 
-    // Choice validation
-    if (isInteger(choice) && (stoi(choice) == 1 || stoi(choice) == 2)) {
-        intChoice = stoi(choice);
-        return intChoice;
-    } else {
-        cout << "Invalid Choice. Please select 1 or 2..." << el;
-        cout << "-------------------------------------" << el;
+    if (!choice) {
+        cout << "Invalid choice. Please select 1 or 2..." << el;
         return returnMenu();
     }
+
+    return choice;
 }
 
 string saveImage(Image &image) {
@@ -406,6 +372,26 @@ void copyImage(Image &source, Image &destination){
         }
     }
 }
+
+int choiceSelection(vector <int> range) {
+    // Input
+    string choice;
+    int intChoice;
+    getline(cin, choice);
+
+    // Input Validation
+    if (isInteger(choice)) {
+        intChoice = stoi(choice);
+        if (intChoice >= range[0] && intChoice <= range[1]) {
+            return intChoice;
+        } else {
+            return 0;
+        }
+    } else {
+        return 0;
+    }
+}
+
 
 // GrayScale Filter
 void GSfilter(Image &image){
@@ -631,21 +617,15 @@ vector <int> frameColorConfiguration(Image &image) {
          << "7) Custom (Hex Code)" << el
          << "8) Return to size configuration" << el;
 
-    string colorChoice;
-    int intColorChoice;
+    int colorChoice = choiceSelection({1, 8});
 
-    getline(cin, colorChoice);
-
-    // Choice validation
-    if (isInteger(colorChoice) && stoi(colorChoice) > 0 && stoi(colorChoice) < 9) {
-        intColorChoice = stoi(colorChoice);
-    } else {
+    if (!colorChoice) {
         cout << "Invalid choice. Please select an integer between 1 and 8 (inclusive)." << el;
         return frameColorConfiguration(image);
     }
 
     vector <int> color;
-    switch (intColorChoice) {
+    switch (colorChoice) {
         case 1: {
             color = {255, 0, 0};
             return color;
