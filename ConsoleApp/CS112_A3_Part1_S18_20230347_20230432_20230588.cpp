@@ -70,6 +70,8 @@ void resizeImage(Image &image, int newWidth, int newHeight);
 
 // Blur Filter
 
+// Infrared Filter
+void infraredFilter(Image &image);
 
 int main() {
     // Display Header
@@ -152,11 +154,12 @@ void filterSelection() {
              << "10) Detect Image Edges" << el
              << "11) Resizing Images" << el
              << "12) Blur Images" << space << "(NOT ADDED YET)" << el
+             << "17) Infrared Filter" << space << el
              << "13) Save current Image" << el
              << "14) Return to previous menu" << el;
 
         // Input
-        int choice = choiceSelection({1, 14});
+        int choice = choiceSelection({1, 17});
 
         if (!choice) {
             cout << "Invalid choice. Please select a number between 1 and 14 (inclusive)..." << el;
@@ -297,6 +300,10 @@ void filterSelection() {
             }
             case 12: {
                 // Blur Images
+                break;
+            }
+            case 17: {
+                infraredFilter(image);
                 break;
             }
             case 13: {
@@ -772,4 +779,31 @@ void resizeImage(Image &image, int newWidth, int newHeight){
     }
     // Store the resized image in the original variable to be able to retrieve it in the menus.
     image = newImage;
+}
+
+// Infrared Filter
+void infraredFilter(Image &image){
+    // Puts the same values (average) in all channels in one pixel
+    for(int i = 0; i < image.width; ++i){
+        for(int j = 0; j < image.height; ++j){
+            unsigned int avg = 0;
+            for(int k = 0; k < 3; ++k){
+                avg += image(i, j, k);
+            }
+            avg = avg/3;
+            for (int k = 0; k < 3; ++k) {
+                //Increasing red value in the image
+                if(k == 0) {
+                    if(image(i, j, 0) + avg <= 255)
+                        image(i, j, 0) += avg;
+                }
+                else
+                    image(i, j, 0) = 255;
+
+                image(i, j, k) = avg;
+                //Resverse the value of the image
+                image(i, j, k) = -(image(i,j,k) - 255);
+            }
+        }
+    }
 }
