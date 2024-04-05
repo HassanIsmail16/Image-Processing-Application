@@ -280,23 +280,10 @@ void filterSelection() {
                 break;
             }
             case 11: {
-                regex validDimensions(R"((\d+)\s[*xX]\s(\d+))");
-                smatch matches;
-                cout << "Please enter the new dimensions in the format width * height (e.g. 1920 * 1080 or 1920 x 1080)" << el;
-
-                // Input
-                string dimensions;
-                getline(cin, dimensions);
-
-                // Input validation
-                if (regex_match(dimensions, matches, validDimensions)){
-                    int newWidth = stoi(matches[1]);
-                    int newHeight = stoi(matches[2]);
-                    resizeImage(image, newWidth, newHeight);
-                } else{
-                    cout << "Invalid Dimensions. Please enter the new dimensions in the format width * height (e.g. 1920 * 1080 or 1920 x 1080)." << el;
-                    cout << "-------------------------------------" << el;
-                }
+                pair <int, int> dimensions = dimensionsInput();
+                int newWidth = dimensions.first;
+                int newHeight = dimensions.second;
+                resizeImage(image, newWidth, newHeight);
                 break;
             }
             case 12: {
