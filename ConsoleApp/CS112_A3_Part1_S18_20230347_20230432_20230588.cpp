@@ -28,6 +28,7 @@ Image imageInput();
 void copyImage(Image &source, Image &destination);
 bool isInteger(const string& input);
 int choiceSelection(vector <int> range);
+pair <int, int> dimensionsInput();
 
 // GrayScale Filtering
 void GSfilter(Image &image);
@@ -370,9 +371,11 @@ string saveImage(Image &image) {
     }
 }
 
+// Copy an image
 void copyImage(Image &source, Image &destination){
     for (int i = 0; i < destination.width; ++i) {
         for (int j = 0; j < destination.height; ++j) {
+            // Copy each pixel from the original image to the copy.
             for (int k = 0; k < destination.channels; ++k) {
                 destination(i, j, k) = source(i, j, k);
             }
@@ -399,6 +402,29 @@ int choiceSelection(vector <int> range) {
     }
 }
 
+// Get dimensions from user
+pair <int, int> dimensionsInput(){
+    regex validDimensions(R"((\d+)\s[*xX]\s(\d+))");
+    smatch matches;
+    cout << "Please enter the new dimensions in the format width * height (e.g. 1920 * 1080 or 1920 x 1080)" << el;
+
+    // Input
+    string dimensions;
+    getline(cin, dimensions);
+
+    // Validate input format and store valid input in matches
+    if (!regex_match(dimensions, matches, validDimensions)){
+        cout << "Invalid Dimensions. Please enter the new dimensions in the format width * height (e.g. 1920 * 1080 or 1920 x 1080)." << el;
+        cout << "-------------------------------------" << el;
+        return dimensionsInput();
+    }
+
+    // Parse input
+    int width = stoi(matches[1]);
+    int height = stoi(matches[2]);
+
+    return {width, height};
+}
 
 // GrayScale Filter
 void GSfilter(Image &image){
@@ -479,11 +505,14 @@ void mergeFilter(Image &image) {
 
 // Flip Image
 void flipImageHorizontally(Image &image){
+    // Initialize a copy of the original image
     Image copy(image.width, image.height);
     copyImage(image, copy);
 
+    // Loop through all pixels
     for (int i = 0; i < image.width; ++i) {
         for (int j = 0; j < image.height; ++j) {
+            // fill the image from right to left.
             for (int k = 0; k < image.channels; ++k) {
                 image(i, j, k) = copy(image.width - 1 - i, j, k);
             }
@@ -492,11 +521,14 @@ void flipImageHorizontally(Image &image){
 }
 
 void flipImageVertically(Image &image){
+    // Initialize a copy of the original image
     Image copy(image.width, image.height);
     copyImage(image, copy);
 
+    // Loop through all pixels
     for (int i = 0; i < image.width; ++i) {
         for (int j = 0; j < image.height; ++j) {
+            // fill the image from buttom to top.
             for (int k = 0; k < image.channels; ++k) {
                 image(i, j, k) = copy(i, image.height - 1 - j, k);
             }
