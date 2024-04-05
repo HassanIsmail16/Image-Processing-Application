@@ -55,6 +55,10 @@ void rotate270(Image &image);
 void darkFilter(Image &image);
 void lightFilter(Image &image);
 
+// Crop Images
+void cropImage(Image &image, pair <int, int> dimensions, pair<int, int> coordinates);
+pair <int, int> coordinatesInput();
+
 // Frame Filter
 pair <int, vector <int>> frameConfiguration(Image &image);
 int frameSizeConfiguration(Image &image);
@@ -267,7 +271,9 @@ void filterSelection() {
                 break;
             }
             case 8: {
-                // Crop Images
+                pair <int, int> coordinates = coordinatesInput();
+                pair <int, int> dimensions = dimensionsInput();
+                cropImage(image, dimensions, coordinates);
                 break;
             }
             case 9: {
@@ -391,17 +397,18 @@ int choiceSelection(vector <int> range) {
 
 // Get dimensions from user
 pair <int, int> dimensionsInput(){
+    // Initialize valid input pattern
     regex validDimensions(R"((\d+)\s[*xX]\s(\d+))");
     smatch matches;
-    cout << "Please enter the new dimensions in the format width * height (e.g. 1920 * 1080 or 1920 x 1080)" << el;
 
     // Input
+    cout << "Please enter the new dimensions in the format width * height (e.g. 1920 * 1080 or 1920 x 1080)" << el;
     string dimensions;
     getline(cin, dimensions);
 
     // Validate input format and store valid input in matches
     if (!regex_match(dimensions, matches, validDimensions)){
-        cout << "Invalid Dimensions. Please enter the new dimensions in the format width * height (e.g. 1920 * 1080 or 1920 x 1080)." << el;
+        cout << "Invalid Dimensions. Please enter the new dimensions in the correct format." << el;
         cout << "-------------------------------------" << el;
         return dimensionsInput();
     }
@@ -581,6 +588,35 @@ void lightFilter(Image &image){
             }
         }
     }
+}
+
+// Crop Images
+void cropImage(Image &image, pair <int, int> dimensions, pair<int, int> coordinates){
+
+
+}
+pair <int, int> coordinatesInput(){
+    // Initialize valid input pattern
+    regex validCoordinates(R"((\d+),\s(\d+))");
+    smatch matches;
+
+    // Input
+    cout << "Please enter coordinates separated by a comma for the starting point (e.g. 300, 400):" << el;
+    string coordinates;
+    getline(cin, coordinates);
+
+    // Validate input format and store valid input in matches
+    if (!regex_match(coordinates, matches, validCoordinates)){
+        cout << "Invalid Coordinates. Please enter coordinates in the correct format." << el;
+        cout << "-------------------------------------" << el;
+        return coordinatesInput();
+    }
+
+    // Parse input
+    int coordinateX = stoi(matches[1]);
+    int coordinateY = stoi(matches[2]);
+
+    return {coordinateX, coordinateY};
 }
 
 // Frame Filter
