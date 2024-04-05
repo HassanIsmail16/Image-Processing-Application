@@ -363,9 +363,11 @@ string saveImage(Image &image) {
     }
 }
 
+// Copy an image
 void copyImage(Image &source, Image &destination){
     for (int i = 0; i < destination.width; ++i) {
         for (int j = 0; j < destination.height; ++j) {
+            // Copy each pixel from the original image to the copy.
             for (int k = 0; k < destination.channels; ++k) {
                 destination(i, j, k) = source(i, j, k);
             }
@@ -472,11 +474,14 @@ void mergeFilter(Image &image) {
 
 // Flip Image
 void flipImageHorizontally(Image &image){
+    // Initialize a copy of the original image
     Image copy(image.width, image.height);
     copyImage(image, copy);
 
+    // Loop through all pixels
     for (int i = 0; i < image.width; ++i) {
         for (int j = 0; j < image.height; ++j) {
+            // fill the image from right to left.
             for (int k = 0; k < image.channels; ++k) {
                 image(i, j, k) = copy(image.width - 1 - i, j, k);
             }
@@ -485,11 +490,14 @@ void flipImageHorizontally(Image &image){
 }
 
 void flipImageVertically(Image &image){
+    // Initialize a copy of the original image
     Image copy(image.width, image.height);
     copyImage(image, copy);
 
+    // Loop through all pixels
     for (int i = 0; i < image.width; ++i) {
         for (int j = 0; j < image.height; ++j) {
+            // fill the image from buttom to top.
             for (int k = 0; k < image.channels; ++k) {
                 image(i, j, k) = copy(i, image.height - 1 - j, k);
             }
