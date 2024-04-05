@@ -419,7 +419,7 @@ pair <int, int> dimensionsInput(){
         return dimensionsInput();
     }
 
-    // Prase input
+    // Parse input
     int width = stoi(matches[1]);
     int height = stoi(matches[2]);
 
