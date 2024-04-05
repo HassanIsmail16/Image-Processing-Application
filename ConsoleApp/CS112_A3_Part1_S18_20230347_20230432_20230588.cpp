@@ -9,7 +9,7 @@ Author3 (name - ID - Group - Section - Email):	Mohamed Ali Hassan Amin          
 Teaching Assistant:		    Ahmed Foad Lotfy
 Who did what:
     Hassan Ali:         Main Menu, Image Input Function, Image Save Function, Filter Selection Function, Invert Image Filter, Image Rotation Filters, Frame Filter.
-    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter, Resize Filter.
+    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter.
     Mohamed Ali:        Grayscale Filter, Merge Image Filter (INCOMPLETE), Lighten & Darken Image Filters, Edge Detection Filter.
  */
 
@@ -28,7 +28,6 @@ Image imageInput();
 void copyImage(Image &source, Image &destination);
 bool isInteger(const string& input);
 int choiceSelection(vector <int> range);
-pair <int, int> dimensionsInput();
 
 // GrayScale Filtering
 void GSfilter(Image &image);
@@ -56,8 +55,8 @@ void darkFilter(Image &image);
 void lightFilter(Image &image);
 
 // Crop Images
+pair <int, int> coordinatesInput(Image &image);
 void cropImage(Image &image, pair <int, int> dimensions, pair<int, int> coordinates);
-pair <int, int> coordinatesInput();
 
 // Frame Filter
 pair <int, vector <int>> frameConfiguration(Image &image);
@@ -71,6 +70,7 @@ void frameFilter(Image &image, pair <int, vector <int>> configuration);
 void edgeFilter(Image &image);
 
 // Resize Images
+pair <int, int> dimensionsInput();
 void resizeImage(Image &image, int newWidth, int newHeight);
 
 // Blur Filter
@@ -271,9 +271,25 @@ void filterSelection() {
                 break;
             }
             case 8: {
-                pair <int, int> coordinates = coordinatesInput();
+                // Input coordinates
+                cout << "Current image dimensions: " << image.width << " x " << image.height << el;
+                pair <int, int> coordinates = coordinatesInput(image);
+
+                // Calculate crop bounderies
+                int horizontalBound = image.width - coordinates.first + 1;
+                int verticalBound = image.height - coordinates.second + 1;
+
+                // Input crop dimensions
+                cout << "Maximum crop dimensions: " << horizontalBound << " x " << verticalBound << el;
                 pair <int, int> dimensions = dimensionsInput();
-                cropImage(image, dimensions, coordinates);
+
+                // Validate the dimensions according to the bounderies
+                if (dimensions.first > horizontalBound || dimensions.second > verticalBound){
+                    cerr << "Invalid crop dimensions. please enter dimensions less than or equal to the maximum allowed dimensions.." << el;
+                    cout << "-------------------------------------" << el;
+                } else{
+                    cropImage(image, dimensions, coordinates);
+                }
                 break;
             }
             case 9: {
@@ -286,6 +302,7 @@ void filterSelection() {
                 break;
             }
             case 11: {
+                cout << "Current image dimensions: " << image.width << " x " << image.height << el;
                 pair <int, int> dimensions = dimensionsInput();
                 int newWidth = dimensions.first;
                 int newHeight = dimensions.second;
@@ -393,31 +410,6 @@ int choiceSelection(vector <int> range) {
     } else {
         return 0;
     }
-}
-
-// Get dimensions from user
-pair <int, int> dimensionsInput(){
-    // Initialize valid input pattern
-    regex validDimensions(R"((\d+)\s[*xX]\s(\d+))");
-    smatch matches;
-
-    // Input
-    cout << "Please enter the new dimensions in the format width * height (e.g. 1920 * 1080 or 1920 x 1080)" << el;
-    string dimensions;
-    getline(cin, dimensions);
-
-    // Validate input format and store valid input in matches
-    if (!regex_match(dimensions, matches, validDimensions)){
-        cout << "Invalid Dimensions. Please enter the new dimensions in the correct format." << el;
-        cout << "-------------------------------------" << el;
-        return dimensionsInput();
-    }
-
-    // Parse input
-    int width = stoi(matches[1]);
-    int height = stoi(matches[2]);
-
-    return {width, height};
 }
 
 // GrayScale Filter
@@ -592,10 +584,22 @@ void lightFilter(Image &image){
 
 // Crop Images
 void cropImage(Image &image, pair <int, int> dimensions, pair<int, int> coordinates){
+    Image result(dimensions.first, dimensions.second);
 
+    // Loop through all result pixels
+    for (int reulstRow = 0, imageRow = coordinates.first - 1; reulstRow < result.width; ++reulstRow, ++imageRow) {
+        for (int resultCol = 0, imageCol = coordinates.second - 1; resultCol < result.height; ++resultCol, ++imageCol) {
+            // Traverse through original image pixels starting from the coordinates and assing them to the result.
+            for (int channel = 0; channel < result.channels; ++channel) {
+                result(reulstRow, resultCol, channel) = image(imageRow, imageCol, channel);
+            }
+        }
+    }
 
+    // Assign result to the image.
+    image = result;
 }
-pair <int, int> coordinatesInput(){
+pair <int, int> coordinatesInput(Image &image){
     // Initialize valid input pattern
     regex validCoordinates(R"((\d+),\s(\d+))");
     smatch matches;
@@ -609,12 +613,26 @@ pair <int, int> coordinatesInput(){
     if (!regex_match(coordinates, matches, validCoordinates)){
         cout << "Invalid Coordinates. Please enter coordinates in the correct format." << el;
         cout << "-------------------------------------" << el;
-        return coordinatesInput();
+        return coordinatesInput(image);
     }
 
     // Parse input
     int coordinateX = stoi(matches[1]);
     int coordinateY = stoi(matches[2]);
+
+    // Make sure coordinates are inside the image.
+    if (coordinateX > image.width || coordinateY > image.height){
+        cout << "Invalid Coordinates. Plase enter coordinates inside the bounds of the image." << el;
+        cout << "-------------------------------------" << el;
+        return coordinatesInput(image);
+    }
+
+    // Reject 0 coordinates
+    if (coordinateX  == 0 || coordinateY == 0){
+        cout << "Invalid Coordinates. Coordinates can't be zero..." << el;
+        cout << "-------------------------------------" << el;
+        return coordinatesInput(image);
+    }
 
     return {coordinateX, coordinateY};
 }
@@ -814,6 +832,34 @@ void edgeFilter(Image &image){
 }
 
 // Resize Image
+pair <int, int> dimensionsInput(){
+    // Initialize valid input pattern
+    regex validDimensions(R"((\d+)\s[*xX]\s(\d+))");
+    smatch matches;
+
+    // Input
+    cout << "Please enter the new dimensions in the format width * height (e.g. 1920 * 1080 or 1920 x 1080)" << el;
+    string dimensions;
+    getline(cin, dimensions);
+
+    // Validate input format and store valid input in matches
+    if (!regex_match(dimensions, matches, validDimensions)){
+        cout << "Invalid Dimensions. Please enter the new dimensions in the correct format." << el;
+        cout << "-------------------------------------" << el;
+        return dimensionsInput();
+    }
+    else if (stoi(matches[1]) == 0 || stoi(matches[2]) == 0){
+        cout << "Invalid Dimensions. Dimensions can't be zero..." << el;
+        cout << "-------------------------------------" << el;
+        return dimensionsInput();
+    }
+
+    // Parse input
+    int width = stoi(matches[1]);
+    int height = stoi(matches[2]);
+
+    return {width, height};
+}
 void resizeImage(Image &image, int newWidth, int newHeight){
     // Initialize an image with the new dimensions
     Image newImage(newWidth, newHeight);
