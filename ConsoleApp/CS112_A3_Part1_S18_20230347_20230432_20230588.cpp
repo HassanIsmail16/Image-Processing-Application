@@ -28,6 +28,7 @@ Image imageInput();
 void copyImage(Image &source, Image &destination);
 bool isInteger(const string& input);
 int choiceSelection(vector <int> range);
+pair <int, int> dimensionsInput();
 
 // GrayScale Filtering
 void GSfilter(Image &image);
@@ -401,6 +402,29 @@ int choiceSelection(vector <int> range) {
     }
 }
 
+// Get dimensions from user
+pair <int, int> dimensionsInput(){
+    regex validDimensions(R"((\d+)\s[*xX]\s(\d+))");
+    smatch matches;
+    cout << "Please enter the new dimensions in the format width * height (e.g. 1920 * 1080 or 1920 x 1080)" << el;
+
+    // Input
+    string dimensions;
+    getline(cin, dimensions);
+
+    // Validate input format and store valid input in matches
+    if (!regex_match(dimensions, matches, validDimensions)){
+        cout << "Invalid Dimensions. Please enter the new dimensions in the format width * height (e.g. 1920 * 1080 or 1920 x 1080)." << el;
+        cout << "-------------------------------------" << el;
+        return dimensionsInput();
+    }
+
+    // Prase input
+    int width = stoi(matches[1]);
+    int height = stoi(matches[2]);
+
+    return {width, height};
+}
 
 // GrayScale Filter
 void GSfilter(Image &image){
