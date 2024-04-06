@@ -75,6 +75,9 @@ void resizeImage(Image &image, int newWidth, int newHeight);
 
 // Blur Filter
 
+// Purple Filter
+void purpleFilter(Image &image);
+
 // Infrared Filter
 void infraredFilter(Image &image);
 
@@ -161,6 +164,7 @@ void filterSelection() {
              << "10) Detect Image Edges" << el
              << "11) Resizing Images" << el
              << "12) Blur Images" << space << "(NOT ADDED YET)" << el
+             << "16) Purple Filter" << space << el
              << "17) Infrared Filter" << space << el
              << "13) Save current Image" << el
              << "14) Return to previous menu" << el;
@@ -313,6 +317,10 @@ void filterSelection() {
             }
             case 12: {
                 // Blur Images
+                break;
+            }
+            case 16: {
+                purpleFilter(image);
                 break;
             }
             case 17: {
@@ -882,6 +890,31 @@ void resizeImage(Image &image, int newWidth, int newHeight){
     }
     // Store the resized image in the original variable to be able to retrieve it in the menus.
     image = newImage;
+}
+
+// Purple Filter
+void purpleFilter(Image &image){
+    // Iterate over each pixel
+    for(int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            // Add a constant value to red and blue values
+            for (int k = 0; k < 3; ++k) {
+                if (k == 1)
+                    continue;
+                if (image(i, j, k) + 55 < 255) {  // 50
+                    image(i, j, k) += 55;
+                } else
+                    image(i, j, k) = 255;
+            }
+            // Reduce the light in the image
+            for (int k = 0; k < 3; ++k) {
+                if(image(i,j,k) - 35 > 0) // 40
+                    image(i,j,k) -= 35;
+                else
+                    image(i,j,k) = 0;
+            }
+        }
+    }
 }
 
 // Infrared Filter
