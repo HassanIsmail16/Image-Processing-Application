@@ -78,6 +78,8 @@ void resizeImage(Image &image, int newWidth, int newHeight);
 // Infrared Filter
 void infraredFilter(Image &image);
 
+// Oil Painting Fitler
+
 int main() {
     // Display Header
     cout << "---------------------------------------" << el
@@ -437,7 +439,7 @@ void blackAndWhiteFilter(Image &image){
             // Calculate greyscale intensity to determine if the color is closer to black or white
             greyScaleValue = (image(i, j, 0) + image(i, j, 1) + image(i, j, 2)) / 3;
 
-            // If the greyscale intensity is closer to black back the pixel black, otherwise make it white.
+            // If the greyscale intensity is closer to black turn the pixel black, otherwise turn it white.
             if (greyScaleValue < 128){
                 color = 0;
             }
