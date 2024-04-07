@@ -9,7 +9,7 @@ Author3 (name - ID - Group - Section - Email):	Mohamed Ali Hassan Amin          
 Teaching Assistant:		    Ahmed Foad Lotfy
 Who did what:
     Hassan Ali:         Main Menu, Image Input Function, Image Save Function, Filter Selection Function, Invert Image Filter, Image Rotation Filters, Frame Filter.
-    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter, Resize Filter.
+    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter.
     Mohamed Ali:        Grayscale Filter, Merge Image Filter (INCOMPLETE), Lighten & Darken Image Filters, Edge Detection Filter.
  */
 
@@ -54,6 +54,10 @@ void rotate270(Image &image);
 void darkFilter(Image &image);
 void lightFilter(Image &image);
 
+// Crop Images
+pair <int, int> coordinatesInput(Image &image);
+void cropImage(Image &image, pair <int, int> dimensions, pair<int, int> coordinates);
+
 // Frame Filter
 pair<int, vector<int>> frameConfiguration(Image &image);
 int frameSizeConfiguration(Image &image);
@@ -66,6 +70,7 @@ void frameFilter(Image &image, pair<int, vector<int>> configuration);
 void edgeFilter(Image &image);
 
 // Resize Images
+pair <int, int> dimensionsInput();
 void resizeImage(Image &image, int newWidth, int newHeight);
 
 // Blur Filter
@@ -76,6 +81,12 @@ vector<vector<double>> constructGaussianKernel(double kernelSize, double standar
 double getConvolutedCell(int value, int kernelX, int kernelY, const vector<vector<double>> &gaussianKernel);
 Image kernelConvolution(Image &image, double kernelSize, const vector<vector<double>>& gaussianKernel);
 void gaussianBlur(Image &image);
+
+// Purple Filter
+void purpleFilter(Image &image);
+
+// Infrared Filter
+void infraredFilter(Image &image);
 
 int main() {
     // Display Header
@@ -150,16 +161,24 @@ void filterSelection() {
              << "5) Flip Image" << el
              << "6) Rotate Image" << el
              << "7) Darken and Lighten Image" << el
-             << "8) Crop Images" << "(NOT ADDED YET)" << space << el
+             << "8) Crop Image" << el
              << "9) Adding a Frame to the Picture" << el
              << "10) Detect Image Edges" << el
-             << "11) Resizing Images" << el
-             << "12) Blur Images" << el
-             << "13) Save current Image" << el
-             << "14) Return to previous menu" << el;
+             << "11) Resize Image" << el
+             << "12) Blur Image" << el
+             << "13) Make image warmer (Land of Wano)" << el
+             << "14) Apply The Oil Painting Effect" << el
+             << "15) CRT Filter (TV Effect)" << el
+             << "16) Purple Overlay" << el
+             << "17) Infrared Filter" << el
+             << "18) Skew Image" << el
+             << "19) Saturate Image" << el
+             << "20) Decrease Image Opacity" << el
+             << "21) Save current Image" << el
+             << "22) Return to previous menu" << el;
 
         // Input
-        int choice = choiceSelection({1, 14});
+        int choice = choiceSelection({1, 22});
 
         switch (choice) {
             case 1: {
@@ -249,7 +268,25 @@ void filterSelection() {
                 break;
             }
             case 8: {
-                // Crop Images
+                // Input coordinates
+                cout << "Current image dimensions: " << image.width << " x " << image.height << el;
+                pair <int, int> coordinates = coordinatesInput(image);
+
+                // Calculate crop bounderies
+                int horizontalBound = image.width - coordinates.first + 1;
+                int verticalBound = image.height - coordinates.second + 1;
+
+                // Input crop dimensions
+                cout << "Maximum crop dimensions: " << horizontalBound << " x " << verticalBound << el;
+                pair <int, int> dimensions = dimensionsInput();
+
+                // Validate the dimensions according to the bounderies
+                if (dimensions.first > horizontalBound || dimensions.second > verticalBound){
+                    cerr << "Invalid crop dimensions. please enter dimensions less than or equal to the maximum allowed dimensions.." << el;
+                    cout << "-------------------------------------" << el;
+                } else{
+                    cropImage(image, dimensions, coordinates);
+                }
                 break;
             }
             case 9: {
@@ -262,23 +299,11 @@ void filterSelection() {
                 break;
             }
             case 11: {
-                regex validDimensions(R"((\d+)\s[*xX]\s(\d+))");
-                smatch matches;
-                cout << "Please enter the new dimensions in the format width * height (e.g. 1920 * 1080 or 1920 x 1080)" << el;
-
-                // Input
-                string dimensions;
-                getline(cin, dimensions);
-
-                // Input validation
-                if (regex_match(dimensions, matches, validDimensions)){
-                    int newWidth = stoi(matches[1]);
-                    int newHeight = stoi(matches[2]);
-                    resizeImage(image, newWidth, newHeight);
-                } else{
-                    cout << "Invalid Dimensions. Please enter the new dimensions in the format width * height (e.g. 1920 * 1080 or 1920 x 1080)." << el;
-                    cout << "-------------------------------------" << el;
-                }
+                cout << "Current image dimensions: " << image.width << " x " << image.height << el;
+                pair <int, int> dimensions = dimensionsInput();
+                int newWidth = dimensions.first;
+                int newHeight = dimensions.second;
+                resizeImage(image, newWidth, newHeight);
                 break;
             }
             case 12: {
@@ -286,11 +311,43 @@ void filterSelection() {
                 break;
             }
             case 13: {
+                // Warmer Image Land of Wano
+                break;
+            }
+            case 14: {
+                // Oil Painting
+                break;
+            }
+            case 15: {
+                // CRT Filter TV Effect
+                break;
+            }
+            case 16: {
+                purpleFilter(image);
+                break;
+            }
+            case 17: {
+                infraredFilter(image);
+                break;
+            }
+            case 18: {
+                // Skew Image
+                break;
+            }
+            case 19: {
+                // Saturation
+                break;
+            }
+            case 20: {
+                // Transparency
+                break;
+            }
+            case 21: {
                 saveImage(image);
                 loopStatus = false;
                 break;
             }
-            case 14: {
+            case 22: {
                 if (returnMenu() == 1) {
                     saveImage(image);
                 } else {
@@ -350,9 +407,11 @@ string saveImage(Image &image) {
     }
 }
 
+// Copy an image
 void copyImage(Image &source, Image &destination){
     for (int i = 0; i < destination.width; ++i) {
         for (int j = 0; j < destination.height; ++j) {
+            // Copy each pixel from the original image to the copy.
             for (int k = 0; k < destination.channels; ++k) {
                 destination(i, j, k) = source(i, j, k);
             }
@@ -360,7 +419,7 @@ void copyImage(Image &source, Image &destination){
     }
 }
 
-int choiceSelection(pair <int, int> range) {
+int choiceSelection(pair<int, int> range) {
     // Input
     string choice;
     int intChoice;
@@ -378,7 +437,6 @@ int choiceSelection(pair <int, int> range) {
         return 0;
     }
 }
-
 
 // GrayScale Filter
 void GSfilter(Image &image){
@@ -459,11 +517,14 @@ void mergeFilter(Image &image) {
 
 // Flip Image
 void flipImageHorizontally(Image &image){
+    // Initialize a copy of the original image
     Image copy(image.width, image.height);
     copyImage(image, copy);
 
+    // Loop through all pixels
     for (int i = 0; i < image.width; ++i) {
         for (int j = 0; j < image.height; ++j) {
+            // fill the image from right to left.
             for (int k = 0; k < image.channels; ++k) {
                 image(i, j, k) = copy(image.width - 1 - i, j, k);
             }
@@ -472,11 +533,14 @@ void flipImageHorizontally(Image &image){
 }
 
 void flipImageVertically(Image &image){
+    // Initialize a copy of the original image
     Image copy(image.width, image.height);
     copyImage(image, copy);
 
+    // Loop through all pixels
     for (int i = 0; i < image.width; ++i) {
         for (int j = 0; j < image.height; ++j) {
+            // fill the image from buttom to top.
             for (int k = 0; k < image.channels; ++k) {
                 image(i, j, k) = copy(i, image.height - 1 - j, k);
             }
@@ -542,6 +606,61 @@ void lightFilter(Image &image){
             }
         }
     }
+}
+
+// Crop Images
+void cropImage(Image &image, pair <int, int> dimensions, pair<int, int> coordinates){
+    Image result(dimensions.first, dimensions.second);
+
+    // Loop through all result pixels
+    for (int reulstRow = 0, imageRow = coordinates.first - 1; reulstRow < result.width; ++reulstRow, ++imageRow) {
+        for (int resultCol = 0, imageCol = coordinates.second - 1; resultCol < result.height; ++resultCol, ++imageCol) {
+            // Traverse through original image pixels starting from the coordinates and assing them to the result.
+            for (int channel = 0; channel < result.channels; ++channel) {
+                result(reulstRow, resultCol, channel) = image(imageRow, imageCol, channel);
+            }
+        }
+    }
+
+    // Assign result to the image.
+    image = result;
+}
+pair <int, int> coordinatesInput(Image &image){
+    // Initialize valid input pattern
+    regex validCoordinates(R"((\d+),\s(\d+))");
+    smatch matches;
+
+    // Input
+    cout << "Please enter coordinates separated by a comma for the starting point (e.g. 300, 400):" << el;
+    string coordinates;
+    getline(cin, coordinates);
+
+    // Validate input format and store valid input in matches
+    if (!regex_match(coordinates, matches, validCoordinates)){
+        cout << "Invalid Coordinates. Please enter coordinates in the correct format." << el;
+        cout << "-------------------------------------" << el;
+        return coordinatesInput(image);
+    }
+
+    // Parse input
+    int coordinateX = stoi(matches[1]);
+    int coordinateY = stoi(matches[2]);
+
+    // Make sure coordinates are inside the image.
+    if (coordinateX > image.width || coordinateY > image.height){
+        cout << "Invalid Coordinates. Plase enter coordinates inside the bounds of the image." << el;
+        cout << "-------------------------------------" << el;
+        return coordinatesInput(image);
+    }
+
+    // Reject 0 coordinates
+    if (coordinateX  == 0 || coordinateY == 0){
+        cout << "Invalid Coordinates. Coordinates can't be zero..." << el;
+        cout << "-------------------------------------" << el;
+        return coordinatesInput(image);
+    }
+
+    return {coordinateX, coordinateY};
 }
 
 // Frame Filter
@@ -740,6 +859,35 @@ void edgeFilter(Image &image){
 }
 
 // Resize Image
+pair<int, int> dimensionsInput(){
+    // Initialize valid input pattern
+    regex validDimensions(R"((\d+)\s[*xX]\s(\d+))");
+    smatch matches;
+
+    // Input
+    cout << "Please enter the new dimensions in the format width * height (e.g. 1920 * 1080 or 1920 x 1080)" << el;
+    string dimensions;
+    getline(cin, dimensions);
+
+    // Validate input format and store valid input in matches
+    if (!regex_match(dimensions, matches, validDimensions)){
+        cout << "Invalid Dimensions. Please enter the new dimensions in the correct format." << el;
+        cout << "-------------------------------------" << el;
+        return dimensionsInput();
+    }
+    else if (stoi(matches[1]) == 0 || stoi(matches[2]) == 0){
+        cout << "Invalid Dimensions. Dimensions can't be zero..." << el;
+        cout << "-------------------------------------" << el;
+        return dimensionsInput();
+    }
+
+    // Parse input
+    int width = stoi(matches[1]);
+    int height = stoi(matches[2]);
+
+    return {width, height};
+}
+
 void resizeImage(Image &image, int newWidth, int newHeight){
     // Initialize an image with the new dimensions
     Image newImage(newWidth, newHeight);
@@ -925,4 +1073,56 @@ void gaussianBlur(Image &image) {
 
     // Does the kernel convolution process to the image to blur it
     image = kernelConvolution(image, kernelSize, gaussianKernel);
+}
+
+// Purple Filter
+void purpleFilter(Image &image){
+    // Iterate over each pixel
+    for(int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            // Add a constant value to red and blue values
+            for (int k = 0; k < 3; ++k) {
+                if (k == 1)
+                    continue;
+                if (image(i, j, k) + 55 < 255) {  // 50
+                    image(i, j, k) += 55;
+                } else
+                    image(i, j, k) = 255;
+            }
+            // Reduce the light in the image
+            for (int k = 0; k < 3; ++k) {
+                if(image(i,j,k) - 35 > 0) // 40
+                    image(i,j,k) -= 35;
+                else
+                    image(i,j,k) = 0;
+            }
+        }
+    }
+}
+
+// Infrared Filter
+void infraredFilter(Image &image){
+    // Puts the same values (average) in all channels in one pixel
+    for(int i = 0; i < image.width; ++i){
+        for(int j = 0; j < image.height; ++j){
+            unsigned int avg = 0;
+            for(int k = 0; k < 3; ++k){
+                avg += image(i, j, k);
+            }
+            avg = avg/3;
+            for (int k = 0; k < 3; ++k) {
+                //Increasing red value in the image
+                if(k == 0) {
+                    if(image(i, j, 0) + avg <= 255)
+                        image(i, j, 0) += avg;
+                }
+                else
+                    image(i, j, 0) = 255;
+
+                image(i, j, k) = avg;
+                //Resverse the value of the image
+                image(i, j, k) = -(image(i,j,k) - 255);
+            }
+        }
+    }
 }
