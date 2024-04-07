@@ -55,7 +55,7 @@ void darkFilter(Image &image);
 void lightFilter(Image &image);
 
 // Crop Images
-pair <int, int> coordinatesInput(Image &image);
+pair<int, int> coordinatesInput(Image &image);
 void cropImage(Image &image, pair <int, int> dimensions, pair<int, int> coordinates);
 
 // Frame Filter
@@ -70,13 +70,13 @@ void frameFilter(Image &image, pair<int, vector<int>> configuration);
 void edgeFilter(Image &image);
 
 // Resize Images
-pair <int, int> dimensionsInput();
+pair<int, int> dimensionsInput();
 void resizeImage(Image &image, int newWidth, int newHeight);
 
 // Blur Filter
 double getGaussianKernelSize(Image &image);
 double getGaussianStandardDeviation(double kernelSize);
-double gaussianModel(double x, double y, double variance);
+double gaussianModel(double x, double y, double standardDeviation);
 vector<vector<double>> constructGaussianKernel(double kernelSize, double standardDeviation);
 double getConvolutedCell(int value, int kernelX, int kernelY, const vector<vector<double>> &gaussianKernel);
 Image kernelConvolution(Image &image, double kernelSize, const vector<vector<double>>& gaussianKernel);
@@ -87,6 +87,11 @@ void purpleFilter(Image &image);
 
 // Infrared Filter
 void infraredFilter(Image &image);
+
+// Skew Filter
+pair<double, int> getSkewAngle();
+int getTranslationValue(int y, double angle, int height);
+void skewImage(Image &image);
 
 int main() {
     // Display Header
@@ -331,7 +336,7 @@ void filterSelection() {
                 break;
             }
             case 18: {
-                // Skew Image
+                skewImage(image);
                 break;
             }
             case 19: {
@@ -1120,9 +1125,78 @@ void infraredFilter(Image &image){
                     image(i, j, 0) = 255;
 
                 image(i, j, k) = avg;
-                //Resverse the value of the image
+                // Reverse the value of the image
                 image(i, j, k) = -(image(i,j,k) - 255);
             }
         }
     }
 }
+
+// Skew Filter
+pair<double, int> getSkewAngle() {
+    cout << "Please enter a skew angle between -89 and 89 to be used. (float/double)" << el;
+
+    string skewAngleString;
+    getline(cin, skewAngleString);
+
+    // Input validation
+    double skewAngle;
+
+    // Validates that it's a valid double value
+    try {
+        skewAngle = stod(skewAngleString);
+    } catch (invalid_argument& e) {
+        cout << "Invalid input. Your input \"" << skewAngleString << "\" doesn't represent a float/double." << el;
+        return getSkewAngle();
+    }
+
+    // Determines the skew direciton
+    int skewDirection = (skewAngle >= 0) ? 1 : -1;
+
+    // Validates that the angle is not less than 0
+    if (skewAngle < -89) {
+        cout << "Invalid input. The angle you entered is less than -89." << el;
+        return getSkewAngle();
+    }
+
+    // Validates that the angle is not higher than 90
+    if (skewAngle > 89) {
+        cout << "Invalid input. The angle you entered is higher than 89." << el;
+        return getSkewAngle();
+    }
+
+    return {abs(skewAngle), skewDirection};
+}
+
+int getTranslationValue(int y, double angle, int height) {
+    int translatedCoordinate = (height - y) * tan((angle * M_PI) / 180);
+    return translatedCoordinate;
+}
+
+void skewImage(Image &image) {
+    // Gets the skew configuration from user
+    pair<double, int> skewConfiguration = getSkewAngle();
+
+    // Gets the skew angle
+    double angle = skewConfiguration.first;
+
+    // Gets the skew direction
+    int direction = skewConfiguration.second;
+
+    // Creates a new image to be skewed
+    Image skewedImage(image.width + getTranslationValue(0, angle, image.height), image.height);
+
+    for (int row = 0; row < image.height; row++) {
+        for (int col = 0; col < image.width; col++) {
+            // Gets the current translation distance
+            int y = (direction == 1) ? row : image.height - row;
+
+            int currentTranslation = getTranslationValue(y, angle, image.height);
+            for (int channel = 0; channel < image.channels; channel++) {
+                skewedImage(col + currentTranslation, row, channel) = image(col, row, channel);
+            }
+        }
+    }
+    image = skewedImage;
+}
+
