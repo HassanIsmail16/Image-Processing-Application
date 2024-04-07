@@ -8,9 +8,9 @@ Author2 (name - ID - Group - Section - Email):	Momen Abd El-Kader Abd El-Naby Ab
 Author3 (name - ID - Group - Section - Email):	Mohamed Ali Hassan Amin                     20230347 B S18  11410120230347@stud.cu.edu.eg
 Teaching Assistant:		    Ahmed Foad Lotfy
 Who did what:
-    Hassan Ali:         Main Menu, Image Input Function, Image Save Function, Filter Selection Function, Invert Image Filter, Image Rotation Filters, Frame Filter.
-    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter.
-    Mohamed Ali:        Grayscale Filter, Merge Image Filter (INCOMPLETE), Lighten & Darken Image Filters, Edge Detection Filter.
+    Hassan Ali:         Main Menu, Image Input Function, Image Save Function, Filter Selection Function, Invert Image Filter, Image Rotation Filters, Frame Filter, Blur Filter, Skew Filter.
+    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter, Oil Painting Filter.
+    Mohamed Ali:        Grayscale Filter, Merge Image Filter (INCOMPLETE), Lighten & Darken Image Filters, Edge Detection Filter, Purple Filter, Infrared Filter.
  */
 
 #include <bits/stdc++.h>
@@ -91,10 +91,15 @@ void purpleFilter(Image &image);
 // Infrared Filter
 void infraredFilter(Image &image);
 
+
+// Oil Painting Filter
+void oilPainting(Image &image);
+
 // Skew Filter
 pair<double, int> getSkewAngle();
 int getTranslationValue(int y, double angle, int height);
 void skewImage(Image &image);
+
 
 int main() {
     // Display Header
@@ -172,6 +177,11 @@ void filterSelection() {
              << "8) Crop Image" << el
              << "9) Adding a Frame to the Picture" << el
              << "10) Detect Image Edges" << el
+             << "11) Resizing Images" << el
+             << "12) Blur Images" << space << "(NOT ADDED YET)" << el
+             << "14) Oil Painting Filter" << el
+             << "16) Purple Filter" << space << el
+             << "17) Infrared Filter" << space << el
              << "11) Resize Image" << el
              << "12) Blur Image" << el
              << "13) Make image warmer (Land of Wano)" << el
@@ -289,7 +299,7 @@ void filterSelection() {
                 cout << "Current image dimensions: " << image.width << " x " << image.height << el;
                 pair <int, int> coordinates = coordinatesInput(image);
 
-                // Calculate crop bounderies
+                // Calculate crop boundaries
                 int horizontalBound = image.width - coordinates.first + 1;
                 int verticalBound = image.height - coordinates.second + 1;
 
@@ -297,7 +307,7 @@ void filterSelection() {
                 cout << "Maximum crop dimensions: " << horizontalBound << " x " << verticalBound << el;
                 pair <int, int> dimensions = dimensionsInput();
 
-                // Validate the dimensions according to the bounderies
+                // Validate the dimensions according to the boundaries
                 if (dimensions.first > horizontalBound || dimensions.second > verticalBound){
                     cerr << "Invalid crop dimensions. please enter dimensions less than or equal to the maximum allowed dimensions.." << el;
                     cout << "-------------------------------------" << el;
@@ -332,7 +342,7 @@ void filterSelection() {
                 break;
             }
             case 14: {
-                // Oil Painting
+                oilPainting(image);
                 break;
             }
             case 15: {
@@ -480,7 +490,7 @@ void blackAndWhiteFilter(Image &image){
             // Calculate greyscale intensity to determine if the color is closer to black or white
             greyScaleValue = (image(i, j, 0) + image(i, j, 1) + image(i, j, 2)) / 3;
 
-            // If the greyscale intensity is closer to black back the pixel black, otherwise make it white.
+            // If the greyscale intensity is closer to black turn the pixel black, otherwise turn it white.
             if (greyScaleValue < 128){
                 color = 0;
             }
@@ -511,16 +521,16 @@ void invertImage(Image &image) {
 // Merge Filter
 void mergeFilter(Image &image) {
     cout << "Insert a second image to merge" << el;
-    Image imageToMegre = imageInput();
+    Image imageToMerge = imageInput();
 
     unsigned int merge = 0;
 
     // Averages each two corresponding pixels from the two images
-    if (image.width == imageToMegre.width && image.height == imageToMegre.height) {
+    if (image.width == imageToMerge.width && image.height == imageToMerge.height) {
         for (int i = 0; i < image.width; ++i) {
             for (int j = 0; j < image.height; ++j) {
                 for (int k = 0; k < 3; ++k) {
-                    merge = image(i, j, k) + imageToMegre(i, j, k);
+                    merge = image(i, j, k) + imageToMerge(i, j, k);
                     image(i, j, k) = merge / 2;
                 }
                 merge = 0;
@@ -557,7 +567,7 @@ void flipImageVertically(Image &image){
     // Loop through all pixels
     for (int i = 0; i < image.width; ++i) {
         for (int j = 0; j < image.height; ++j) {
-            // fill the image from buttom to top.
+            // fill the image from bottom to top.
             for (int k = 0; k < image.channels; ++k) {
                 image(i, j, k) = copy(i, image.height - 1 - j, k);
             }
@@ -640,11 +650,11 @@ void cropImage(Image &image, pair <int, int> dimensions, pair<int, int> coordina
     Image result(dimensions.first, dimensions.second);
 
     // Loop through all result pixels
-    for (int reulstRow = 0, imageRow = coordinates.first - 1; reulstRow < result.width; ++reulstRow, ++imageRow) {
+    for (int resultRow = 0, imageRow = coordinates.first - 1; resultRow < result.width; ++resultRow, ++imageRow) {
         for (int resultCol = 0, imageCol = coordinates.second - 1; resultCol < result.height; ++resultCol, ++imageCol) {
-            // Traverse through original image pixels starting from the coordinates and assing them to the result.
+            // Traverse through original image pixels starting from the coordinates and assign them to the result.
             for (int channel = 0; channel < result.channels; ++channel) {
-                result(reulstRow, resultCol, channel) = image(imageRow, imageCol, channel);
+                result(resultRow, resultCol, channel) = image(imageRow, imageCol, channel);
             }
         }
     }
@@ -675,7 +685,7 @@ pair <int, int> coordinatesInput(Image &image){
 
     // Make sure coordinates are inside the image.
     if (coordinateX > image.width || coordinateY > image.height){
-        cout << "Invalid Coordinates. Plase enter coordinates inside the bounds of the image." << el;
+        cout << "Invalid Coordinates. Please enter coordinates inside the bounds of the image." << el;
         cout << "-------------------------------------" << el;
         return coordinatesInput(image);
     }
@@ -925,7 +935,7 @@ void resizeImage(Image &image, int newWidth, int newHeight){
 
     for (int row = 0; row < newImage.width; ++row) {
         for (int col = 0; col < newImage.height; ++col) {
-            // Map each pixel in the resized image to its nearest neighboor in the original image.
+            // Map each pixel in the resized image to its nearest neighbor in the original image.
             double mappedRow = floor(row * widthRatio);
             double mappedCol = floor(col * heightRatio);
             for (int channel = 0; channel < newImage.channels; ++channel) {
@@ -1171,6 +1181,64 @@ void infraredFilter(Image &image){
     }
 }
 
+// Oil Painting Filter
+void oilPainting(Image &image){
+    Image result(image.width, image.height);
+    int radius = 5, intensityLevels = 20;
+
+    for (int row = 0; row < image.width; ++row) {
+        for (int col = 0; col < image.height; ++col) {
+            // Analyze the intensity of all pixels within the radius
+
+            // Track the RGB values for each intensity level and the count of each intensity level.
+            int sumR[21] = {0}, sumG[21] = {0}, sumB[21] = {0}, levelCount[21] = {0};
+            int cappedIntensity = 0;
+            double realIntensity = 0;
+            for (int i = - radius; i <= radius; ++i) {
+                for (int j = - radius; j <= radius; ++j) {
+
+                    // Calculate the coordinates of the pixels withing the radius.
+                    int currentX = i + row;
+                    int currentY = j + col;
+
+                    // Work on pixels inside the image border
+                    if ((currentX >= 0) && (currentX < image.width) && (currentY >= 0) && (currentY < image.height)){
+                        // Real intensity is the average of the RGB Channels
+                        realIntensity = (double) (image(currentX, currentY, 0) + image(currentX, currentY, 1) + image(currentX, currentY, 2)) / 3;
+                        // Divide the intensity to a certain amount of levels so that the intensity level falls between 1 and number of intensity level.
+                        cappedIntensity = (realIntensity * intensityLevels) / 255;
+
+                        /* Count the frequency of each intensity level
+                         * Calculate the sum of RGB values to be able to calculate the average later.
+                         * All data for an intensity level is stored at index = intensity level.
+                         */
+                        levelCount[cappedIntensity]++;
+                        sumR[cappedIntensity] += image(currentX, currentY, 0);
+                        sumG[cappedIntensity] += image(currentX, currentY, 1);
+                        sumB[cappedIntensity] += image(currentX, currentY, 2);
+                    }
+                }
+            }
+
+            // Find the most frequent intensity level (most common color within the radius)
+            int maxCount = 0, maxIndex = 0;
+            for (int j = 1; j <= intensityLevels; ++j) {
+                if (maxCount < levelCount[j]) {
+                    maxCount = levelCount[j];
+                    maxIndex = j;
+                }
+            }
+
+            // Assign the pixel the average value of the most frequent intensity level
+            result(row, col, 0) = sumR[maxIndex] / maxCount;
+            result(row, col, 1) = sumG[maxIndex] / maxCount;
+            result(row, col, 2) = sumB[maxIndex] / maxCount;
+        }
+    }
+
+    image = result;
+}
+
 // Skew Filter
 pair<double, int> getSkewAngle() {
     cout << "Please enter a skew angle between -89 and 89 to be used. (float/double)" << el;
@@ -1238,4 +1306,3 @@ void skewImage(Image &image) {
     }
     image = skewedImage;
 }
-
