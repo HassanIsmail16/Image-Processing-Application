@@ -8,9 +8,9 @@ Author2 (name - ID - Group - Section - Email):	Momen Abd El-Kader Abd El-Naby Ab
 Author3 (name - ID - Group - Section - Email):	Mohamed Ali Hassan Amin                     20230347 B S18  11410120230347@stud.cu.edu.eg
 Teaching Assistant:		    Ahmed Foad Lotfy
 Who did what:
-    Hassan Ali:         Main Menu, Image Input Function, Image Save Function, Filter Selection Function, Invert Image Filter, Image Rotation Filters, Frame Filter.
-    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter.
-    Mohamed Ali:        Grayscale Filter, Merge Image Filter (INCOMPLETE), Lighten & Darken Image Filters, Edge Detection Filter.
+    Hassan Ali:         Main Menu, Image Input Function, Image Save Function, Filter Selection Function, Invert Image Filter, Image Rotation Filters, Frame Filter, Blur Filter, Skew Filter.
+    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter, Oil Painting Filter.
+    Mohamed Ali:        Grayscale Filter, Merge Image Filter (INCOMPLETE), Lighten & Darken Image Filters, Edge Detection Filter, Purple Filter, Infrared Filter.
  */
 
 #include <bits/stdc++.h>
@@ -1145,11 +1145,10 @@ void infraredFilter(Image &image){
 // Oil Painting Filter
 void oilPainting(Image &image){
     Image result(image.width, image.height);
-    int radius = 3, intensityLevels = 10;
+    int radius = 5, intensityLevels = 20;
 
-    // Loop through all image pixels that aren't on the border
-    for (int row = radius; row < image.width - radius; ++row) {
-        for (int col = radius; col < image.height - radius; ++col) {
+    for (int row = 0; row < image.width; ++row) {
+        for (int col = 0; col < image.height; ++col) {
             // Analyze the intensity of all pixels within the radius
 
             // Track the RGB values for each intensity level and the count of each intensity level.
@@ -1158,44 +1157,49 @@ void oilPainting(Image &image){
             double realIntensity = 0;
             for (int i = - radius; i <= radius; ++i) {
                 for (int j = - radius; j <= radius; ++j) {
-                    // Real intensity is the average of the RGB Channels
-//                    realIntensity = (double) (image(radius + i, radius + j, 0) + image(radius + i, radius + j, 1) + image(radius + i, radius + j, 2)) / 3;
-                    int r = image(radius + i, radius + j, 0);
-                    int g = image(radius + i, radius + j, 1);
-                    int b = image(radius + i, radius + j, 2);
-                    // Divide the intensity to a certain amount of levels so that the intensity level falls between 1 and number of intensity level.
-//                    cappedIntensity = (realIntensity * intensityLevels) / 255;
-                    cappedIntensity = (int)((double)((r+g+b)/3)*intensityLevels)/255.0f;
 
-                    /* Count the frequency of each intensity level
-                     * Calculate the sum of RGB values to be able to calculate the average later.
-                     * All data for an intensity level is stored at index = intensity level.
-                     */
-                    levelCount[cappedIntensity]++;
-                    sumR[cappedIntensity] += image(radius + i, radius + j, 0);
-                    sumG[cappedIntensity] += image(radius + i, radius + j, 1);
-                    sumB[cappedIntensity] += image(radius + i, radius + j, 2);
-                }
-            }
-                // Find the most frequent intensity level
-                int maxCount = 0, maxIndex = 0;
-                for (int j = 1; j <= intensityLevels; ++j) {
-                    if (maxCount < levelCount[j]) {
-                        maxCount = levelCount[j];
-                        maxIndex = j;
+                    // Calculate the coordinates of the pixels withing the radius.
+                    int currentX = i + row;
+                    int currentY = j + col;
+
+                    // Work on pixels inside the image border
+                    if ((currentX >= 0) && (currentX < image.width) && (currentY >= 0) && (currentY < image.height)){
+                        // Real intensity is the average of the RGB Channels
+                        realIntensity = (double) (image(currentX, currentY, 0) + image(currentX, currentY, 1) + image(currentX, currentY, 2)) / 3;
+                        // Divide the intensity to a certain amount of levels so that the intensity level falls between 1 and number of intensity level.
+                        cappedIntensity = (realIntensity * intensityLevels) / 255;
+
+                        /* Count the frequency of each intensity level
+                         * Calculate the sum of RGB values to be able to calculate the average later.
+                         * All data for an intensity level is stored at index = intensity level.
+                         */
+                        levelCount[cappedIntensity]++;
+                        sumR[cappedIntensity] += image(currentX, currentY, 0);
+                        sumG[cappedIntensity] += image(currentX, currentY, 1);
+                        sumB[cappedIntensity] += image(currentX, currentY, 2);
                     }
                 }
-//                cout << sumR[maxIndex] / maxCount << " " <<  sumG[maxIndex] / maxCount << " " << sumB[maxIndex] / maxCount << el;
-                // Assign the pixel the average value of the most frequent intensity level
-                result(row, col, 0) = sumR[maxIndex] / maxCount;
-                result(row, col, 1) = sumG[maxIndex] / maxCount;
-                result(row, col, 2) = sumB[maxIndex] / maxCount;
+            }
 
+            // Find the most frequent intensity level (most common color within the radius)
+            int maxCount = 0, maxIndex = 0;
+            for (int j = 1; j <= intensityLevels; ++j) {
+                if (maxCount < levelCount[j]) {
+                    maxCount = levelCount[j];
+                    maxIndex = j;
+                }
+            }
+
+            // Assign the pixel the average value of the most frequent intensity level
+            result(row, col, 0) = sumR[maxIndex] / maxCount;
+            result(row, col, 1) = sumG[maxIndex] / maxCount;
+            result(row, col, 2) = sumB[maxIndex] / maxCount;
         }
     }
-    // Store the result in the image variable to be able to retrieve it in the menus.
+
     image = result;
 }
+
 // Skew Filter
 pair<double, int> getSkewAngle() {
     cout << "Please enter a skew angle between -89 and 89 to be used. (float/double)" << el;
