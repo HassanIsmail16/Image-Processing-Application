@@ -82,6 +82,9 @@ double getConvolutedCell(int value, int kernelX, int kernelY, const vector<vecto
 Image kernelConvolution(Image &image, double kernelSize, const vector<vector<double>>& gaussianKernel);
 void gaussianBlur(Image &image);
 
+//
+void sunlightFilter(Image &image);
+
 // Purple Filter
 void purpleFilter(Image &image);
 
@@ -316,7 +319,7 @@ void filterSelection() {
                 break;
             }
             case 13: {
-                // Warmer Image Land of Wano
+                sunlightFilter(image);
                 break;
             }
             case 14: {
@@ -1078,6 +1081,15 @@ void gaussianBlur(Image &image) {
 
     // Does the kernel convolution process to the image to blur it
     image = kernelConvolution(image, kernelSize, gaussianKernel);
+}
+
+// Sunlight Filter
+void sunlightFilter(Image &image){
+    for(int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            image(i, j, 2) *= 0.7;
+        }
+    }
 }
 
 // Purple Filter
