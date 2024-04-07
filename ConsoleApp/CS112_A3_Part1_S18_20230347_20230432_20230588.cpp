@@ -1085,9 +1085,21 @@ void gaussianBlur(Image &image) {
 
 // Sunlight Filter
 void sunlightFilter(Image &image){
+    // Iterate over each pixel
+    unsigned int light = 0;
     for(int i = 0; i < image.width; ++i) {
         for (int j = 0; j < image.height; ++j) {
             image(i, j, 2) *= 0.7;
+            // Reduce blue value in the pixel to get yellow (sunlight) filter
+            for (int k = 0; k < 3; ++k) {
+                // Increase light in image
+                light = image(i,j,k);
+                light /= 5;
+                if(image(i,j,k) + light < 255)
+                    image(i,j,k) += light;
+                else
+                    image(i,j,k) = 255;
+            }
         }
     }
 }
@@ -1095,23 +1107,19 @@ void sunlightFilter(Image &image){
 // Purple Filter
 void purpleFilter(Image &image){
     // Iterate over each pixel
-    for(int i = 0; i < image.width; ++i) {
+    unsigned int light = 0;
+    for (int i = 0; i < image.width; ++i) {
         for (int j = 0; j < image.height; ++j) {
-            // Add a constant value to red and blue values
+            // Reduce green value in the pixel to get purple filter
+            image(i,j,1) *= 0.7;
             for (int k = 0; k < 3; ++k) {
-                if (k == 1)
-                    continue;
-                if (image(i, j, k) + 55 < 255) {  // 50
-                    image(i, j, k) += 55;
-                } else
-                    image(i, j, k) = 255;
-            }
-            // Reduce the light in the image
-            for (int k = 0; k < 3; ++k) {
-                if(image(i,j,k) - 35 > 0) // 40
-                    image(i,j,k) -= 35;
+                // Increase light in image
+                light = image(i,j,k);
+                light /= 6;
+                if(image(i,j,k) + light < 255)
+                    image(i,j,k) += light;
                 else
-                    image(i,j,k) = 0;
+                    image(i,j,k) = 255;
             }
         }
     }
