@@ -51,8 +51,8 @@ void rotate180(Image &image);
 void rotate270(Image &image);
 
 // Darken and Lighten Image
-void darkFilter(Image &image);
-void lightFilter(Image &image);
+void darkFilter(Image &image, float percentage);
+void lightFilter(Image &image, float percentage);
 
 // Crop Images
 pair<int, int> coordinatesInput(Image &image);
@@ -260,13 +260,22 @@ void filterSelection() {
 
                 // Input
                 int darkOrLightChoice = choiceSelection({1, 2});
+                int percentage;
 
                 switch (darkOrLightChoice) {
                     case 1:
-                        darkFilter(image);
+                        cout << "Enter a number from 0 - 100 to dark the image" << el;
+                        cin >> percentage;
+                        cin.clear();
+                        cin.ignore();
+                        darkFilter(image, percentage);
                         break;
                     case 2:
-                        lightFilter(image);
+                        cout << "Enter a number from 0 - 100 to light the image" << el;
+                        cin >> percentage;
+                        cin.clear();
+                        cin.ignore();
+                        lightFilter(image, percentage);
                         break;
                     default:
                         cout << "Invalid Choice. Please select 1 or 2..." << el;
@@ -584,15 +593,20 @@ void rotate270(Image &image) {
 }
 
 // Darken and Lighten Image
-void darkFilter(Image &image) {
+void darkFilter(Image &image, float percentage) {
     int dark;
+
+    if(percentage < 0 || percentage > 100){
+        cout << "Invalid number!" << el << "Please enter a number from 0 to 100!" << el;
+        return;
+    }
 
     for (int i = 0; i < image.width; ++i) {
         for (int j = 0; j < image.height; ++j) {
             for (int k = 0; k < 3; ++k) {
                 dark = image(i, j, k);
-                if (image(i, j, k) > dark / 2)
-                    image(i, j, k) -= dark / 2;
+                if (image(i, j, k) > (dark * (percentage / 100)))
+                    image(i, j, k) -= (dark * (percentage / 100));
                 else
                     image(i, j, k) = 0;
             }
@@ -600,15 +614,20 @@ void darkFilter(Image &image) {
     }
 }
 
-void lightFilter(Image &image){
+void lightFilter(Image &image, float percentage){
     int light;
+
+    if(percentage < 0 || percentage > 100){
+        cout << "Invalid number!" << el << "Please enter a number from 0 to 100!" << el;
+        return;
+    }
 
     for (int i = 0; i < image.width; ++i) {
         for (int j = 0; j < image.height; ++j) {
             for (int k = 0; k < 3; ++k) {
                 light = image(i, j, k);
-                if(image(i,j,k) + (light / 2) < 255)
-                    image(i, j, k) += light / 2;
+                if(image(i,j,k) + (light * (percentage / 100)) < 255)
+                    image(i, j, k) += (light * (percentage / 100));
                 else
                     image(i,j,k) = 255;
             }
