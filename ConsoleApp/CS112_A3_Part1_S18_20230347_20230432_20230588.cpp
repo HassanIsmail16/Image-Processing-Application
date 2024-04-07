@@ -27,7 +27,7 @@ string saveImage(Image &image);
 Image imageInput();
 void copyImage(Image &source, Image &destination);
 bool isInteger(const string& input);
-int choiceSelection(vector <int> range);
+int choiceSelection(pair<int, int> range);
 
 // GrayScale Filtering
 void GSfilter(Image &image);
@@ -59,12 +59,12 @@ pair <int, int> coordinatesInput(Image &image);
 void cropImage(Image &image, pair <int, int> dimensions, pair<int, int> coordinates);
 
 // Frame Filter
-pair <int, vector <int>> frameConfiguration(Image &image);
+pair<int, vector<int>> frameConfiguration(Image &image);
 int frameSizeConfiguration(Image &image);
-vector <int> frameColorConfiguration(Image &image);
+vector<int> frameColorConfiguration(Image &image);
 bool hexCodeValidation(string hexCode);
 int hexConversion(string code);
-void frameFilter(Image &image, pair <int, vector <int>> configuration);
+void frameFilter(Image &image, pair<int, vector<int>> configuration);
 
 // Edge Filter
 void edgeFilter(Image &image);
@@ -74,6 +74,13 @@ pair <int, int> dimensionsInput();
 void resizeImage(Image &image, int newWidth, int newHeight);
 
 // Blur Filter
+double getGaussianKernelSize(Image &image);
+double getGaussianStandardDeviation(double kernelSize);
+double gaussianModel(double x, double y, double variance);
+vector<vector<double>> constructGaussianKernel(double kernelSize, double standardDeviation);
+double getConvolutedCell(int value, int kernelX, int kernelY, const vector<vector<double>> &gaussianKernel);
+Image kernelConvolution(Image &image, double kernelSize, const vector<vector<double>>& gaussianKernel);
+void gaussianBlur(Image &image);
 
 // Purple Filter
 void purpleFilter(Image &image);
@@ -94,20 +101,17 @@ int main() {
 
         int choice = choiceSelection({1, 2});
 
-        if (choice) {
-            switch (choice) {
-                case 1:
-                    filterSelection();
-                    break;
-                case 2:
-                    cout << "Exiting the program..." << el;
-                    return 0;
-                default:
-                    break;
-            }
-        } else {
-            cout << "Invalid Choice. Please select 1 or 2..." << el;
-            cout << "-------------------------------------" << el;
+        switch (choice) {
+            case 1:
+                filterSelection();
+                break;
+            case 2:
+                cout << "Exiting the program..." << el;
+                return 0;
+            default:
+                cout << "Invalid Choice. Please select 1 or 2..." << el;
+                cout << "-------------------------------------" << el;
+                break;
         }
     }
 }
@@ -157,23 +161,24 @@ void filterSelection() {
              << "5) Flip Image" << el
              << "6) Rotate Image" << el
              << "7) Darken and Lighten Image" << el
-             << "8) Crop Images" << "(NOT ADDED YET)" << space << el
+             << "8) Crop Image" << el
              << "9) Adding a Frame to the Picture" << el
              << "10) Detect Image Edges" << el
-             << "11) Resizing Images" << el
-             << "12) Blur Images" << space << "(NOT ADDED YET)" << el
-             << "16) Purple Filter" << space << el
-             << "17) Infrared Filter" << space << el
-             << "13) Save current Image" << el
-             << "14) Return to previous menu" << el;
+             << "11) Resize Image" << el
+             << "12) Blur Image" << el
+             << "13) Make image warmer (Land of Wano)" << el
+             << "14) Apply The Oil Painting Effect" << el
+             << "15) CRT Filter (TV Effect)" << el
+             << "16) Purple Overlay" << el
+             << "17) Infrared Filter" << el
+             << "18) Skew Image" << el
+             << "19) Saturate Image" << el
+             << "20) Decrease Image Opacity" << el
+             << "21) Save current Image" << el
+             << "22) Return to previous menu" << el;
 
         // Input
-        int choice = choiceSelection({1, 17});
-
-        if (!choice) {
-            cout << "Invalid choice. Please select a number between 1 and 14 (inclusive)..." << el;
-            continue;
-        }
+        int choice = choiceSelection({1, 22});
 
         switch (choice) {
             case 1: {
@@ -200,12 +205,6 @@ void filterSelection() {
                 // Input
                 int flipChoice = choiceSelection({1, 2});
 
-                if (!flipChoice) {
-                    cout << "Invalid Choice. Please select 1 or 2..." << el;
-                    cout << "-------------------------------------" << el;
-                    continue;
-                }
-
                 switch (flipChoice) {
                     case 1:
                         flipImageHorizontally(image);
@@ -214,6 +213,8 @@ void filterSelection() {
                         flipImageVertically(image);
                         break;
                     default:
+                        cout << "Invalid Choice. Please select 1 or 2..." << el;
+                        cout << "-------------------------------------" << el;
                         break;
                 }
                 break;
@@ -227,12 +228,6 @@ void filterSelection() {
                 // Input
                 int rotationChoice = choiceSelection({1, 3});
 
-                if (!rotationChoice) {
-                    cout << "Invalid input. Please select an integer between 1 and 3..." << el;
-                    cout << "-------------------------------------" << el;
-                    continue;
-                }
-
                 switch (rotationChoice) {
                     case 1:
                         rotate90(image);
@@ -244,6 +239,8 @@ void filterSelection() {
                         rotate270(image);
                         break;
                     default:
+                        cout << "Invalid input. Please select an integer between 1 and 3..." << el;
+                        cout << "-------------------------------------" << el;
                         break;
                 }
                 break;
@@ -256,12 +253,6 @@ void filterSelection() {
                 // Input
                 int darkOrLightChoice = choiceSelection({1, 2});
 
-                if (!darkOrLightChoice) {
-                    cout << "Invalid Choice. Please select 1 or 2..." << el;
-                    cout << "-------------------------------------" << el;
-                    continue;
-                }
-
                 switch (darkOrLightChoice) {
                     case 1:
                         darkFilter(image);
@@ -270,6 +261,8 @@ void filterSelection() {
                         lightFilter(image);
                         break;
                     default:
+                        cout << "Invalid Choice. Please select 1 or 2..." << el;
+                        cout << "-------------------------------------" << el;
                         break;
                 }
                 break;
@@ -314,7 +307,19 @@ void filterSelection() {
                 break;
             }
             case 12: {
-                // Blur Images
+                gaussianBlur(image);
+                break;
+            }
+            case 13: {
+                // Warmer Image Land of Wano
+                break;
+            }
+            case 14: {
+                // Oil Painting
+                break;
+            }
+            case 15: {
+                // CRT Filter TV Effect
                 break;
             }
             case 16: {
@@ -325,12 +330,24 @@ void filterSelection() {
                 infraredFilter(image);
                 break;
             }
-            case 13: {
+            case 18: {
+                // Skew Image
+                break;
+            }
+            case 19: {
+                // Saturation
+                break;
+            }
+            case 20: {
+                // Transparency
+                break;
+            }
+            case 21: {
                 saveImage(image);
                 loopStatus = false;
                 break;
             }
-            case 14: {
+            case 22: {
                 if (returnMenu() == 1) {
                     saveImage(image);
                 } else {
@@ -340,6 +357,7 @@ void filterSelection() {
                 break;
             }
             default: {
+                cout << "Invalid choice. Please select a number between 1 and 14 (inclusive)..." << el;
                 break;
             }
         }
@@ -401,7 +419,7 @@ void copyImage(Image &source, Image &destination){
     }
 }
 
-int choiceSelection(vector <int> range) {
+int choiceSelection(pair<int, int> range) {
     // Input
     string choice;
     int intChoice;
@@ -410,7 +428,7 @@ int choiceSelection(vector <int> range) {
     // Input Validation
     if (isInteger(choice)) {
         intChoice = stoi(choice);
-        if (intChoice >= range[0] && intChoice <= range[1]) {
+        if (intChoice >= range.first && intChoice <= range.second) {
             return intChoice;
         } else {
             return 0;
@@ -674,23 +692,24 @@ int frameSizeConfiguration(Image &image) {
     getline(cin, frameSize);
 
     // Size input validation
-    if (isInteger(frameSize)) {
-        intFrameSize = stoi(frameSize);
-        if (intFrameSize > 0) {
-            if (intFrameSize <= min(image.width, image.height) / 2) {
-                return intFrameSize;
-            } else {
-                cout << "Invalid input (MAXIMUM SIZE IS " << min(image.width, image.height) / 2 << "px)." << el;
-                return frameSizeConfiguration(image);
-            }
-        } else {
-            cout << "Invalid input (NEGATIVE INTEGER)." << el;
-            return frameSizeConfiguration(image);
-        }
-    } else {
+    if (!isInteger((frameSize))) {
         cout << "Invalid input (NOT AN INTEGER)." << el;
         return frameSizeConfiguration(image);
     }
+
+    intFrameSize = stoi(frameSize);
+
+    if (intFrameSize < 0) {
+        cout << "Invalid input (NEGATIVE INTEGER)." << el;
+        return frameSizeConfiguration(image);
+    }
+
+    if (intFrameSize > min(image.width, image.height) / 2) {
+        cout << "Invalid input (MAXIMUM SIZE IS " << min(image.width, image.height) / 2 << "px)." << el;
+        return frameSizeConfiguration(image);
+    }
+
+    return intFrameSize;
 }
 
 vector <int> frameColorConfiguration(Image &image) {
@@ -840,7 +859,7 @@ void edgeFilter(Image &image){
 }
 
 // Resize Image
-pair <int, int> dimensionsInput(){
+pair<int, int> dimensionsInput(){
     // Initialize valid input pattern
     regex validDimensions(R"((\d+)\s[*xX]\s(\d+))");
     smatch matches;
@@ -868,6 +887,7 @@ pair <int, int> dimensionsInput(){
 
     return {width, height};
 }
+
 void resizeImage(Image &image, int newWidth, int newHeight){
     // Initialize an image with the new dimensions
     Image newImage(newWidth, newHeight);
@@ -888,6 +908,171 @@ void resizeImage(Image &image, int newWidth, int newHeight){
     }
     // Store the resized image in the original variable to be able to retrieve it in the menus.
     image = newImage;
+}
+
+// Blur Filter
+double getGaussianKernelSize(Image &image) {
+    // Gets and validates the kernel size from the user
+    cout << "Please enter the blur radius. Must be a positive ODD integer less than 50px (Higher is more blurred)" << el;
+
+    string kernelSize;
+    getline(cin, kernelSize);
+
+    // Validates that the input is numeric
+    if (!isInteger(kernelSize)) {
+        cout << "Invalid input. Please enter an integer." << el;
+        return getGaussianKernelSize(image);
+    }
+
+    double numericKernelSize = stod(kernelSize);
+
+    // Validates that the input is positive
+    if (numericKernelSize < 1) {
+        cout << "Invalid input. Please enter a positive integer." << el;
+        return getGaussianKernelSize(image);
+    }
+
+    // Validates that the input falls within the image constraint
+    if (numericKernelSize > 50) {
+        cout << "Invalid input. Please enter a positive integer less than 50px." << el;
+        return getGaussianKernelSize(image);
+    }
+
+    // Validates that the input is odd
+    if ((int) numericKernelSize % 2  == 0) {
+        cout << "Invalid input. Please enter an odd integer." << el;
+        return getGaussianKernelSize(image);
+    }
+
+    return numericKernelSize;
+}
+
+double getGaussianStandardDeviation(double kernelSize) {
+    cout << "Please select one of the following choices:" << el
+         << "1) Keep the default Gaussian Standard Deviation" << el
+         << "2) Customize the Gaussian Standard Deviation" << el
+         << "3) Return to kernel size configuration menu" << el
+         << "NOTE: The higher the standard deviation the more concentrated the blur will be on the center." << el;
+
+    int choice = choiceSelection({1, 3});
+
+    switch (choice) {
+        case 1:
+            // Default standard deviation
+            return kernelSize / (2.0 * sqrt(2.0 * log(2.0)));
+        case 2: {
+            cout << "Please enter a positive number to be used as the blur standard deviation. (float/double)" << el;
+
+            string standardDeviationString;
+            getline(cin, standardDeviationString);
+
+            // Input validation
+            double standardDeviation;
+
+            // Validates that it's a valid double value
+            try {
+                standardDeviation = stod(standardDeviationString);
+            } catch (invalid_argument& e) {
+                cout << "Invalid input. Your input \"" << standardDeviationString << "\" doesn't represent a float/double." << el;
+                return getGaussianStandardDeviation(kernelSize);
+            }
+
+            // Validates that the input is positive
+            if (standardDeviation <= 0) {
+                cout << "Invalid input. Please enter a positive number." << el;
+                return getGaussianStandardDeviation(kernelSize);
+            }
+
+            return standardDeviation;
+        }
+        case 3: {
+            return 0;
+        }
+        default:
+            cout << "Invalid input. Please enter a number between 1 and 3 (inclusive)." << el;
+            return getGaussianStandardDeviation(kernelSize);
+    }
+}
+
+double gaussianModel(double x, double y, double standardDeviation) {
+    // Does the Gaussian equation for kernel construction
+    double result = 1.0 / (2.0 * M_PI * pow(standardDeviation, 2)) * exp(- ((pow(x, 2) + pow(y, 2)) / (2.0 * pow(standardDeviation, 2))));
+    return result;
+}
+
+vector<vector<double>> constructGaussianKernel(double kernelSize, double standardDeviation) {
+    vector<vector<double>> gaussianKernel(kernelSize, vector<double>(kernelSize, 0));
+
+    // Gets the weights of the kernel for each cell
+    for (int x = 0; x < (int) kernelSize; x++) {
+        for (int y = 0; y < (int) kernelSize; y++) {
+            gaussianKernel[x][y] = gaussianModel(x - ((kernelSize - 1) / 2), y - ((kernelSize - 1) / 2), standardDeviation);
+        }
+    }
+
+    return gaussianKernel;
+}
+
+double getConvolutedCell(int value, int kernelX, int kernelY, const vector<vector<double>> &gaussianKernel) {
+    // Multiplies the value of the pixel by its corresponding kernel value
+    double result = value * gaussianKernel[kernelX][kernelY];
+    return result;
+}
+
+Image kernelConvolution(Image &image, double kernelSize, const vector<vector<double>>& gaussianKernel) {
+    // Creates a copy of the image to be blurred
+    Image blurredImage(image.width, image.height);
+    copyImage(image, blurredImage);
+
+    // Gets the center of the kernel
+    int center = (int) (kernelSize - 1) / 2;
+
+    // Loops over the image
+    for (int row = 0; row < image.height; row++) {
+        for (int col = 0; col < image.width; col++) {
+            // Initializes the kernel weight sum to normalize the blur values and initializes the blur value for each channel at 0
+            double kernelWeightSum = 0, currentPixelR = 0, currentPixelG = 0, currentPixelB = 0;
+
+            // Loops over each cell of the kernel
+            for (int i = 0; i < kernelSize; i++) {
+                for (int j = 0; j < kernelSize; j++) {
+                    // Gets the pixel that corresponds with the ith row and jth column of the kernel around the current image pixel
+                    int x = col - center + i, y = row - center + j;
+
+                    // Checks if there exists a corresponding pixel for the current kernel cell inside the image
+                    if (x >= 0 && x < image.width && y >= 0 && y < image.height) {
+                        // Gets the resulting blur values for each of the 3 color channels
+                        currentPixelR += getConvolutedCell(image(x, y, 0), i, j, gaussianKernel);
+                        currentPixelG += getConvolutedCell(image(x, y, 1), i, j, gaussianKernel);
+                        currentPixelB += getConvolutedCell(image(x, y, 2), i, j, gaussianKernel);
+
+                        // Gets the weight sum of the used kernel to be used in normalization
+                        kernelWeightSum += gaussianKernel[i][j];
+                    }
+                }
+            }
+
+            // Adjusts the new pixel values
+            blurredImage.setPixel(col, row, 0, currentPixelR / kernelWeightSum);
+            blurredImage.setPixel(col, row, 1, currentPixelG / kernelWeightSum);
+            blurredImage.setPixel(col, row, 2, currentPixelB / kernelWeightSum);
+        }
+    }
+    return blurredImage;
+}
+
+void gaussianBlur(Image &image) {
+    // Gets the desired kernel size from user
+    double kernelSize = getGaussianKernelSize(image);
+
+    // Gets standard deviation for kernel construction
+    double standardDeviation = getGaussianStandardDeviation(kernelSize);
+
+    // Constructs the kernel
+    vector<vector<double>> gaussianKernel = constructGaussianKernel(kernelSize, standardDeviation);
+
+    // Does the kernel convolution process to the image to blur it
+    image = kernelConvolution(image, kernelSize, gaussianKernel);
 }
 
 // Purple Filter
