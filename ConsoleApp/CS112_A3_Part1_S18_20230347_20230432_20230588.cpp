@@ -95,10 +95,25 @@ void infraredFilter(Image &image);
 // Oil Painting Filter
 void oilPainting(Image &image);
 
+// CRT Filter
+void CRTfilter(Image &image);
+
 // Skew Filter
 pair<double, int> getSkewAngle();
 int getTranslationValue(int y, double angle, int height);
 void skewImage(Image &image);
+
+// Saturation
+struct RGB{
+    double r, g, b;
+};
+struct HSL{
+    double h, s, l;
+};
+double saturationConfiguration();
+HSL rgbToHsl(RGB rgbColor);
+RGB hslToRgb(HSL hslColor);
+void changeSaturation(Image &image, double changePrecentage);
 
 
 int main() {
@@ -362,7 +377,8 @@ void filterSelection() {
                 break;
             }
             case 19: {
-                // Saturation
+                double changePercentage = saturationConfiguration();
+                changeSaturation(image, changePercentage);
                 break;
             }
             case 20: {
@@ -384,7 +400,7 @@ void filterSelection() {
                 break;
             }
             default: {
-                cout << "Invalid choice. Please select a number between 1 and 14 (inclusive)..." << el;
+                cout << "Invalid choice. Please select a number between 1 and 22 (inclusive)..." << el;
                 break;
             }
         }
@@ -1305,4 +1321,132 @@ void skewImage(Image &image) {
         }
     }
     image = skewedImage;
+}
+
+// Saturation
+double saturationConfiguration(){
+    // Get change percentage
+    cout << "Plase enter the change percentage (+ve to increase saturation or -ve to decrease saturation): " << el;
+    string strChangePercentage;
+    getline(cin, strChangePercentage);
+
+    // Validate change percentage
+    regex number(R"([-]*(\d+)[.]*(\d+))");
+    if (regex_match(strChangePercentage, number)){
+        return stod(strChangePercentage);
+    }
+    else {
+        cout << "Invalid Input. Please enter a valid number." << el;
+        cout << "-------------------------------------" << el;
+        return saturationConfiguration();
+    }
+}
+
+HSL rgbToHsl(RGB rgbColor){
+    // Initialize HSL color structure to store the result.
+    HSL hslColor;
+
+    // Divide RGB values by 255 to change the range from [0, 255] to [0, 1]
+    double R = rgbColor.r / 255, G = rgbColor.g / 255, B = rgbColor.b / 255;
+
+    // Calculate the max and min colors
+    double maxC = max(R, max(G, B));
+    double minC = min(R, min(G, B));
+    double delta = maxC - minC;
+
+    // Calculate the Hue
+    if (delta == 0){
+        hslColor.h = 0;
+    }
+    else if (maxC == R){
+        hslColor.h = 60 * (fmod((G - B) / delta, 6));
+    }
+    else if (maxC == G){
+        hslColor.h = 60 * (((B - R) / delta) + 2);
+    }
+    else {
+        hslColor.h = 60 * (((R - G) / delta) + 4);
+    }
+    // Make sure that the hue is positive
+    if (hslColor.h < 0) hslColor.h += 360;
+
+    // Calculate Lightness
+    hslColor.l = (maxC + minC) / 2;
+
+    // Calculate the saturation
+    if (delta == 0){
+        hslColor.s = 0;
+    }
+    else {
+        hslColor.s = delta / (1 - fabs(2 * hslColor.l - 1));
+    }
+
+    return hslColor;
+}
+
+RGB hslToRgb(HSL hslColor){
+    // Initialize RGB color structure to store the result.
+    RGB rgbColor;
+
+    // Variables used to convert HSL to RGB
+    double C, X, m;
+    C = (1 - fabs(2 * hslColor.l - 1)) * hslColor.s;
+    X = C * (1 - fabs(fmod(hslColor.h / 60, 2) - 1));
+    m = hslColor.l - C / 2;
+
+    // Convert HSL to RGB depending on the value of Hue
+    if (hslColor.h < 60){
+        rgbColor = {C + m, X + m, m};
+    }
+    else if (hslColor.h < 120){
+        rgbColor = {X + m, C + m, m};
+    }
+    else if (hslColor.h < 180){
+        rgbColor = {m, C + m, X +m};
+    }
+    else if (hslColor.h < 240){
+        rgbColor = {m, X + m, C + m};
+    }
+    else if (hslColor.h < 300){
+        rgbColor = {X + m, m, C + m};
+    }
+    else {
+        rgbColor = {C + m, m, X + m};
+    }
+
+    // Convert from [0, 1] range to [0, 255]
+    rgbColor.r *= 255;
+    rgbColor.g *= 255;
+    rgbColor.b *= 255;
+
+    return rgbColor;
+}
+
+void changeSaturation(Image &image, double changePrecentage){
+
+    // Calculate saturation factore
+    double changeFactor = (double) (100 + changePrecentage) / 100;
+
+    for (int row = 0; row < image.width; ++row) {
+        for (int col = 0; col < image.height; ++col) {
+            double r = image(row, col, 0), g = image(row, col, 1), b = image(row, col, 2);
+            // Convert RGB color space to HSL color space
+            RGB rgbColor = {r, g, b};
+            HSL hslColor = rgbToHsl(rgbColor);
+
+            // Increase/decrease saturation in HSL color space
+            hslColor.s *= changeFactor;
+
+            // Ensure that the value of the new saturation is between [0, 1]
+            hslColor.s = max(min(hslColor.s, 1.0), 0.0);
+
+            // Convert HSL color space back to RGB
+            rgbColor = hslToRgb(hslColor);
+
+            // Change the saturation of the image
+            image(row, col, 0) = rgbColor.r;
+            image(row, col, 1) = rgbColor.g;
+            image(row, col, 2) = rgbColor.b;
+        }
+    }
 }
