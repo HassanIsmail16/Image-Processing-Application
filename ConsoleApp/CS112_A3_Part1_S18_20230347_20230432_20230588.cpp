@@ -9,7 +9,7 @@ Author3 (name - ID - Group - Section - Email):	Mohamed Ali Hassan Amin          
 Teaching Assistant:		    Ahmed Foad Lotfy
 Who did what:
     Hassan Ali:         Main Menu, Image Input Function, Image Save Function, Filter Selection Function, Invert Image Filter, Image Rotation Filters, Frame Filter, Blur Filter, Skew Filter.
-    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter, Oil Painting Filter.
+    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter, Oil Painting Filter, Saturation Filter.
     Mohamed Ali:        Grayscale Filter, Merge Image Filter (INCOMPLETE), Lighten & Darken Image Filters, Edge Detection Filter, Purple Filter, Infrared Filter.
  */
 
@@ -82,7 +82,7 @@ double getConvolutedCell(int value, int kernelX, int kernelY, const vector<vecto
 Image kernelConvolution(Image &image, double kernelSize, const vector<vector<double>>& gaussianKernel);
 void gaussianBlur(Image &image);
 
-//
+// Sunlight Filter
 void sunlightFilter(Image &image);
 
 // Purple Filter
@@ -90,7 +90,6 @@ void purpleFilter(Image &image);
 
 // Infrared Filter
 void infraredFilter(Image &image);
-
 
 // Oil Painting Filter
 void oilPainting(Image &image);
