@@ -9,7 +9,7 @@ Author3 (name - ID - Group - Section - Email):	Mohamed Ali Hassan Amin          
 Teaching Assistant:		    Ahmed Foad Lotfy
 Who did what:
     Hassan Ali:         Main Menu, Image Input Function, Image Save Function, Filter Selection Function, Invert Image Filter, Image Rotation Filters, Frame Filter, Blur Filter, Skew Filter.
-    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter, Oil Painting Filter, Saturation Configuration, Constrast Configuration.
+    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Merge Configuration, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter, Oil Painting Filter, Saturation Configuration, Constrast Configuration.
     Mohamed Ali:        Grayscale Filter, Merge Image Filter (INCOMPLETE), Lighten & Darken Image Filters, Edge Detection Filter, Purple Filter, Infrared Filter.
  */
 
@@ -39,7 +39,9 @@ void blackAndWhiteFilter(Image &image);
 void invertImage(Image &image);
 
 // Image Merging
-void mergeFilter(Image &image);
+void mergeFilter(Image &image, Image &image2);
+void mergeFilter2(Image &image, Image &image2, Image &result);
+void mergeConfiguration(Image &image, Image &image2);
 
 // Flip Image
 void flipImageHorizontally(Image &image);
@@ -94,8 +96,8 @@ void infraredFilter(Image &image);
 // Oil Painting Filter
 void oilPainting(Image &image);
 
-// CRT Filter
-void CRTfilter(Image &image);
+// Old TV Filter
+void oldTVFilter(Image &image);
 
 // Skew Filter
 pair<double, int> getSkewAngle();
@@ -187,7 +189,7 @@ void filterSelection() {
              << "1) Grayscale Conversion" << el
              << "2) Black and White" << el
              << "3) Invert Image" << el
-             << "4) Merge Images" << space << "(NOT COMPLETE)" << el
+             << "4) Merge Images" << space << el
              << "5) Flip Image" << el
              << "6) Rotate Image" << el
              << "7) Darken and Lighten Image" << el
@@ -195,7 +197,7 @@ void filterSelection() {
              << "9) Adding a Frame to the Picture" << el
              << "10) Detect Image Edges" << el
              << "11) Resizing Images" << el
-             << "12) Blur Images" << space << "(NOT ADDED YET)" << el
+             << "12) Blur Images" << space << el
              << "14) Oil Painting Filter" << el
              << "16) Purple Filter" << space << el
              << "17) Infrared Filter" << space << el
@@ -203,7 +205,7 @@ void filterSelection() {
              << "12) Blur Image" << el
              << "13) Make image warmer (Land of Wano)" << el
              << "14) Apply The Oil Painting Effect" << el
-             << "15) CRT Filter (TV Effect)" << el
+             << "15) Old TV Filter" << el
              << "16) Purple Overlay" << el
              << "17) Infrared Filter" << el
              << "18) Skew Image" << el
@@ -229,7 +231,15 @@ void filterSelection() {
                 break;
             }
             case 4: {
-                mergeFilter(image);
+                cout << "First Image Dimensions: " << image.width << " x " << image.height << el
+                     << "Please insert the second image to merge" << el;
+                Image image2 = imageInput();
+                if (image.width == image2.width && image.height == image2.height){
+                    mergeFilter(image, image2);
+                }
+                else {
+                    mergeConfiguration(image, image2);
+                }
                 break;
             }
             case 5: {
@@ -363,7 +373,7 @@ void filterSelection() {
                 break;
             }
             case 15: {
-                // CRT Filter TV Effect
+                oldTVFilter(image);
                 break;
             }
             case 16: {
@@ -538,26 +548,63 @@ void blackAndWhiteFilter(Image &image){
     }
 
 // Merge Filter
-void mergeFilter(Image &image) {
-    cout << "Insert a second image to merge" << el;
-    Image imageToMerge = imageInput();
+void mergeFilter(Image &image, Image &image2) {
+    unsigned int merge = 0;
+    // Averages each two corresponding pixels from the two images
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            for (int k = 0; k < 3; ++k) {
+                merge = image(i, j, k) + image2(i, j, k);
+                image(i, j, k) = merge / 2;
+            }
+            merge = 0;
+        }
+    }
+}
+
+void mergeFilter2(Image &image, Image &image2, Image &result){
 
     unsigned int merge = 0;
-
     // Averages each two corresponding pixels from the two images
-    if (image.width == imageToMerge.width && image.height == imageToMerge.height) {
-        for (int i = 0; i < image.width; ++i) {
-            for (int j = 0; j < image.height; ++j) {
-                for (int k = 0; k < 3; ++k) {
-                    merge = image(i, j, k) + imageToMerge(i, j, k);
-                    image(i, j, k) = merge / 2;
-                }
-                merge = 0;
+    for (int i = 0; i < result.width; ++i) {
+        for (int j = 0; j < result.height; ++j) {
+            for (int k = 0; k < 3; ++k) {
+                merge = image(i, j, k) + image2(i, j, k);
+                result(i, j, k) = merge / 2;
             }
+            merge = 0;
         }
-    } else {
-        cout << "Please resize the images to merge." << el;
-        return;
+    }
+
+    image = result;
+}
+
+void mergeConfiguration(Image &image, Image &image2){
+    cout << "First Image Dimensions: " << image.width << " x " << image.height << el
+         << "Second Image Dimensions: " << image2.width << " x " << image2.height << el
+         << "The two images appear to have different dimensions, what would you like to do?" << el
+         << "1) Resize both images to the biggest width and biggest height." << el
+         << "2) Merge the common area between the smaller width and smaller height." << el;
+
+    int choice = choiceSelection({1, 2});
+    switch (choice) {
+        case 1:{
+            int maxWidth = max(image.width, image2.width);
+            int maxHeight = max(image.height, image2.height);
+            resizeImage(image, maxWidth, maxHeight);
+            resizeImage(image2, maxWidth, maxHeight);
+            mergeFilter(image, image2);
+        }
+        case 2:{
+            int minWidth = min(image.width, image2.width);
+            int minHeight = min(image.height, image2.height);
+            Image result(minWidth, minHeight);
+            mergeFilter2(image, image2, result);
+        }
+        default:
+            cout << "Invalid Choice. Please select 1 or 2..." << el;
+            cout << "-------------------------------------" << el;
+            break;
     }
 }
 
@@ -1258,6 +1305,11 @@ void oilPainting(Image &image){
     image = result;
 }
 
+// Old TV Filter
+void oldTVFilter(Image &image){
+
+}
+
 // Skew Filter
 pair<double, int> getSkewAngle() {
     cout << "Please enter a skew angle between -89 and 89 to be used. (float/double)" << el;
@@ -1333,16 +1385,23 @@ double saturationConfiguration(){
     string strChangePercentage;
     getline(cin, strChangePercentage);
 
-    // Validate change percentage
+    // Validate input
     regex number(R"([-]*(\d+)[.]*(\d+))");
-    if (regex_match(strChangePercentage, number)){
-        return stod(strChangePercentage);
-    }
-    else {
+    if (!regex_match(strChangePercentage, number)){
         cout << "Invalid Input. Please enter a valid number." << el;
         cout << "-------------------------------------" << el;
         return saturationConfiguration();
     }
+
+    // Validate change percentage value
+    double changePercentage = stod(strChangePercentage);
+    if (changePercentage < -100 || changePercentage > 100){
+        cout << "Invalid Input. Please enter a number within the range -100 and 100." << el;
+        cout << "-------------------------------------" << el;
+        return saturationConfiguration();
+    }
+
+    return changePercentage;
 }
 
 HSL rgbToHsl(RGB rgbColor){
