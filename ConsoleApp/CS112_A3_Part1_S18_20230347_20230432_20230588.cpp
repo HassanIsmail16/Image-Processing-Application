@@ -9,7 +9,7 @@ Author3 (name - ID - Group - Section - Email):	Mohamed Ali Hassan Amin          
 Teaching Assistant:		    Ahmed Foad Lotfy
 Who did what:
     Hassan Ali:         Main Menu, Image Input Function, Image Save Function, Filter Selection Function, Invert Image Filter, Image Rotation Filters, Frame Filter, Blur Filter, Skew Filter.
-    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter, Oil Painting Filter.
+    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter, Oil Painting Filter, Saturation Configuration, Constrast Configuration.
     Mohamed Ali:        Grayscale Filter, Merge Image Filter (INCOMPLETE), Lighten & Darken Image Filters, Edge Detection Filter, Purple Filter, Infrared Filter.
  */
 
@@ -91,7 +91,6 @@ void purpleFilter(Image &image);
 // Infrared Filter
 void infraredFilter(Image &image);
 
-
 // Oil Painting Filter
 void oilPainting(Image &image);
 
@@ -103,7 +102,7 @@ pair<double, int> getSkewAngle();
 int getTranslationValue(int y, double angle, int height);
 void skewImage(Image &image);
 
-// Saturation
+// Change Saturation
 struct RGB{
     double r, g, b;
 };
@@ -113,8 +112,11 @@ struct HSL{
 double saturationConfiguration();
 HSL rgbToHsl(RGB rgbColor);
 RGB hslToRgb(HSL hslColor);
-void changeSaturation(Image &image, double changePrecentage);
+void changeSaturation(Image &image, double changePercentage);
 
+// Change Contrast
+int contrastConfiguration();
+void changeContrast(Image &image, int contrast);
 
 int main() {
     // Display Header
@@ -205,8 +207,8 @@ void filterSelection() {
              << "16) Purple Overlay" << el
              << "17) Infrared Filter" << el
              << "18) Skew Image" << el
-             << "19) Saturate Image" << el
-             << "20) Decrease Image Opacity" << el
+             << "19) Change Image Saturation" << el
+             << "20) Change Image Contrast" << el
              << "21) Save current Image" << el
              << "22) Return to previous menu" << el;
 
@@ -382,7 +384,8 @@ void filterSelection() {
                 break;
             }
             case 20: {
-                // Transparency
+                int contrast = contrastConfiguration();
+                changeContrast(image, contrast);
                 break;
             }
             case 21: {
@@ -408,7 +411,7 @@ void filterSelection() {
 }
 
 bool isInteger(const string& input){
-    regex integer(R"(\d+)");
+    regex integer(R"([-]*\d+)");
     return regex_match(input, integer);
 }
 
@@ -1273,7 +1276,7 @@ pair<double, int> getSkewAngle() {
         return getSkewAngle();
     }
 
-    // Determines the skew direciton
+    // Determines the skew direction
     int skewDirection = (skewAngle >= 0) ? 1 : -1;
 
     // Validates that the angle is not less than 0
@@ -1326,7 +1329,7 @@ void skewImage(Image &image) {
 // Saturation
 double saturationConfiguration(){
     // Get change percentage
-    cout << "Plase enter the change percentage (+ve to increase saturation or -ve to decrease saturation): " << el;
+    cout << "Please enter the change percentage (+ve to increase saturation or -ve to decrease saturation):" << el;
     string strChangePercentage;
     getline(cin, strChangePercentage);
 
@@ -1422,10 +1425,10 @@ RGB hslToRgb(HSL hslColor){
     return rgbColor;
 }
 
-void changeSaturation(Image &image, double changePrecentage){
+void changeSaturation(Image &image, double changePercentage){
 
-    // Calculate saturation factore
-    double changeFactor = (double) (100 + changePrecentage) / 100;
+    // Calculate saturation change factor
+    double changeFactor = (double) (100 + changePercentage) / 100;
 
     for (int row = 0; row < image.width; ++row) {
         for (int col = 0; col < image.height; ++col) {
@@ -1447,6 +1450,47 @@ void changeSaturation(Image &image, double changePrecentage){
             image(row, col, 0) = rgbColor.r;
             image(row, col, 1) = rgbColor.g;
             image(row, col, 2) = rgbColor.b;
+        }
+    }
+}
+
+// Contrast
+int contrastConfiguration(){
+    // Get new contrast value
+    cout << "Please enter a contrast value between -255 and 255 (+ve mean to increase contrast and -ve to decrease contrast):" << el;
+    string strContrast;
+    getline(cin, strContrast);
+
+    // Validate integer input
+    if (!isInteger(strContrast)){
+        cout << "Invalid Input. Please enter a valid integer." << el;
+        cout << "-------------------------------------" << el;
+        return contrastConfiguration();
+    }
+
+    // Validate contrast value
+    int contrast = stoi(strContrast);
+    if (contrast < -255 || contrast > 255){
+        cout << "Invalid Input. Please enter an integer within the range -255 and 255." << el;
+        cout << "-------------------------------------" << el;
+        return contrastConfiguration();
+    }
+
+    return contrast;
+}
+
+void changeContrast(Image &image, int contrast){
+
+    // Calculate contrast change factor
+    double changeFactor = (double) (259 * (contrast + 255)) / (255 * (259 - contrast));
+
+    for (int row = 0; row < image.width; ++row) {
+        for (int col = 0; col < image.height; ++col) {
+            for (int channel = 0; channel < image.channels; ++channel) {
+                // Calculate new channel value and make sure it's between 0 and 255
+                int newVal = changeFactor * (image(row, col, channel) - 128) + 128;
+                image(row, col, channel) = max(0, min(newVal, 255));
+            }
         }
     }
 }
