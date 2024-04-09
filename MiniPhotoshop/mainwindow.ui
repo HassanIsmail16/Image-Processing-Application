@@ -41,9 +41,6 @@ border-radius: 25px;</string>
     <property name="text">
      <string>Open an Image</string>
     </property>
-    <property name="icon">
-     <iconset theme="accessories-calculator"/>
-    </property>
    </widget>
    <widget class="QLabel" name="Heading">
     <property name="geometry">
