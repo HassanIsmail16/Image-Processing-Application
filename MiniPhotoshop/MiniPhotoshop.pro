@@ -1,4 +1,6 @@
-QT       += core gui
+QT       += \
+    core gui \
+    widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,6 +15,8 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
+    qapplication.h \
+    ui_mainwindow.h \
     mainwindow.h \
     Image_Class.h \
     stb_image.h \

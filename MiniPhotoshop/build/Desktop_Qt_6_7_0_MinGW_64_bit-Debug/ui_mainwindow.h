@@ -10,6 +10,7 @@
 #define UI_MAINWINDOW_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
@@ -47,6 +48,8 @@ public:
 "color: rgb(255, 255, 255);\n"
 "font: 700 9pt \"Poppins\";\n"
 "border-radius: 25px;"));
+        QIcon icon(QIcon::fromTheme(QString::fromUtf8("accessories-calculator")));
+        openImage->setIcon(icon);
         Heading = new QLabel(centralwidget);
         Heading->setObjectName("Heading");
         Heading->setGeometry(QRect(100, 200, 641, 81));
