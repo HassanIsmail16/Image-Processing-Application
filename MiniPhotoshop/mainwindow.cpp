@@ -1,11 +1,17 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <bits/stdc++.h>
-// #include "Image_Class.h"
+#include "Image_Class.h"
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QImage>
+
+#define el "\n"
+#define space " "
 
 using namespace std;
+
+Image mainImage;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -17,33 +23,29 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-
-
 void MainWindow::on_openImage_clicked() {
     // Gets image from user
-    QString filename = QFileDialog::getOpenFileName(this, tr("Select an image to be edited"), "./", "Images (*.png *.bmp *.jpg *.jpeg)");
+    QString filename = QFileDialog::getOpenFileName(this, tr("Select an image to be edited"), QDir::homePath(), "Images (*.png *.bmp *.jpg *.jpeg)");
 
-    // Exception Handling Here //
-    if (QString::compare(filename, QString()) == 0) {
+    // Makes sure that the input is valid and loads the image
+    if (!filename.isEmpty()) {
+        // Image loading
+        QImage qImage(filename);
+        QPixmap imagePixmap = QPixmap::fromImage(qImage);
 
+        // Get label dimensions
+        int width = ui -> imageDisplay -> width();
+        int height = ui -> imageDisplay -> height();
+
+        // Display image
+        ui -> imageDisplay -> setPixmap(imagePixmap.scaled(width, height, Qt::KeepAspectRatio));
+        ui -> imageDisplay -> setAlignment(Qt::AlignCenter); // Center image
+
+        // Convert to regular image
+        mainImage.loadNewImage(filename.toStdString());
+
+        // Switch to main page
+        ui -> stackedWidget -> setCurrentIndex(1);
     }
-
-    QImage image;
-    bool validImage = image.load(filename);
-
-    // Exception Handling Here //
-    if (!validImage) {
-
-    }
-
-    // Display Image
-    image = image.scaledToHeight(ui -> imageDisplay -> height(), Qt::SmoothTransformation);
-    ui -> imageDisplay -> setAlignment(Qt::AlignCenter);
-    ui -> imageDisplay -> setPixmap(QPixmap::fromImage(image));
-
-    // Update UI
-    ui -> openImage -> hide();
-    ui -> createImage -> hide();
-    ui -> Heading -> hide();
 }
 
