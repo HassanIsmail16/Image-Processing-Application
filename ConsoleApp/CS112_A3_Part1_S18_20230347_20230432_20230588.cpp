@@ -111,7 +111,7 @@ struct RGB{
 struct HSL{
     double h, s, l;
 };
-double saturationConfiguration();
+double getPercentage();
 HSL rgbToHsl(RGB rgbColor);
 RGB hslToRgb(HSL hslColor);
 void changeSaturation(Image &image, double changePercentage);
@@ -291,33 +291,21 @@ void filterSelection() {
                 break;
             }
             case 7: {
-                cout << "Please select one of the following choices:" << el
-                     << "1) Darken Image" << el
-                     << "2) Lighten Image" << el;
-
                 // Input
-                int darkOrLightChoice = choiceSelection({1, 2});
-                int percentage;
+                cout << "Please enter the change percentage (+ve to lighten the image or -ve to darken the image):" << el;
+                int percentage = getPercentage();
 
-                switch (darkOrLightChoice) {
-                    case 1:
-                        cout << "Enter a number from 0 - 100 to dark the image" << el;
-                        cin >> percentage;
-                        cin.clear();
-                        cin.ignore();
-                        darkFilter(image, percentage);
-                        break;
-                    case 2:
-                        cout << "Enter a number from 0 - 100 to light the image" << el;
-                        cin >> percentage;
-                        cin.clear();
-                        cin.ignore();
-                        lightFilter(image, percentage);
-                        break;
-                    default:
-                        cout << "Invalid Choice. Please select 1 or 2..." << el;
-                        cout << "-------------------------------------" << el;
-                        break;
+                if (percentage == 0){
+                    break;
+                }
+                else if (percentage > 0){
+                    lightFilter(image, percentage);
+                    break;
+                }
+                else{
+                    percentage = abs(percentage);
+                    darkFilter(image, percentage);
+                    break;
                 }
                 break;
             }
@@ -389,7 +377,8 @@ void filterSelection() {
                 break;
             }
             case 19: {
-                double changePercentage = saturationConfiguration();
+                cout << "Please enter the change percentage (+ve to increase saturation or -ve to decrease saturation):" << el;
+                double changePercentage = getPercentage();
                 changeSaturation(image, changePercentage);
                 break;
             }
@@ -562,6 +551,7 @@ void mergeFilter(Image &image, Image &image2) {
     }
 }
 
+// Merge the common parts of the 2 images into a third image.
 void mergeFilter2(Image &image, Image &image2, Image &result){
 
     unsigned int merge = 0;
@@ -1379,9 +1369,8 @@ void skewImage(Image &image) {
 }
 
 // Saturation
-double saturationConfiguration(){
+double getPercentage(){
     // Get change percentage
-    cout << "Please enter the change percentage (+ve to increase saturation or -ve to decrease saturation):" << el;
     string strChangePercentage;
     getline(cin, strChangePercentage);
 
@@ -1390,7 +1379,7 @@ double saturationConfiguration(){
     if (!regex_match(strChangePercentage, number)){
         cout << "Invalid Input. Please enter a valid number." << el;
         cout << "-------------------------------------" << el;
-        return saturationConfiguration();
+        return getPercentage();
     }
 
     // Validate change percentage value
@@ -1398,7 +1387,7 @@ double saturationConfiguration(){
     if (changePercentage < -100 || changePercentage > 100){
         cout << "Invalid Input. Please enter a number within the range -100 and 100." << el;
         cout << "-------------------------------------" << el;
-        return saturationConfiguration();
+        return getPercentage();
     }
 
     return changePercentage;
