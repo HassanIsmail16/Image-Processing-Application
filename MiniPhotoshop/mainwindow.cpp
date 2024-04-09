@@ -6,6 +6,9 @@
 #include <QMessageBox>
 #include <QImage>
 
+#define el "\n"
+#define space " "
+
 using namespace std;
 
 Image mainImage;
@@ -38,13 +41,11 @@ void MainWindow::on_openImage_clicked() {
         ui -> imageDisplay -> setPixmap(imagePixmap.scaled(width, height, Qt::KeepAspectRatio));
         ui -> imageDisplay -> setAlignment(Qt::AlignCenter); // Center image
 
-        // Hide welcome scree widgets
-        ui -> openImage -> hide();
-        ui -> createImage -> hide();
-        ui -> Heading -> hide();
-
         // Convert to regular image
         mainImage.loadNewImage(filename.toStdString());
+
+        // Switch to main page
+        ui -> stackedWidget -> setCurrentIndex(1);
     }
 }
 

@@ -15,9 +15,9 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
+    mainwindow.h \
     qapplication.h \
     ui_mainwindow.h \
-    mainwindow.h \
     Image_Class.h \
     stb_image.h \
     stb_image_write.h
