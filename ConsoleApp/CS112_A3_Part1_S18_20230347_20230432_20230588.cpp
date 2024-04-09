@@ -526,16 +526,16 @@ void blackAndWhiteFilter(Image &image){
 }
 
 // Image Inversion Filter
-void invertImage(Image &image) {
-    // Subtracts the current channel value from 255
-    for (int x = 0; x < image.width; x++) {
-        for (int y = 0; y < image.height; y++) {
-            for (int channel = 0; channel < image.channels; channel++) {
-                image(x, y, channel) = 255 - image(x, y, channel);
+    void invertImage(Image &image) {
+        // Subtracts the current channel value from 255
+        for (int x = 0; x < image.width; x++) {
+            for (int y = 0; y < image.height; y++) {
+                for (int channel = 0; channel < image.channels; channel++) {
+                    image(x, y, channel) = 255 - image(x, y, channel);
+                }
             }
         }
     }
-}
 
 // Merge Filter
 void mergeFilter(Image &image) {
