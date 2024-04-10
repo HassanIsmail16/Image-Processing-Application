@@ -42,6 +42,16 @@ private slots:
 
     void on_infraredBtn_clicked();
 
+    void on_darkenAndLightenBtn_clicked();
+
+    void on_darkenBtn_clicked();
+
+    void on_darkenPercentage_editingFinished();
+
+    void on_lightenBtn_clicked();
+
+    void on_lightenPercentage_editingFinished();
+
 private:
     Ui::MainWindow *ui;
 };

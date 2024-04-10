@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QImage>
+#include <enterspinbox.cpp>
 
 #define el "\n"
 #define space " "
@@ -17,6 +18,9 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow) {
     ui->setupUi(this);
+    connect(ui->darkenPercentage, &EnterSpinBox::editingFinished, this, &MainWindow::on_darkenPercentage_editingFinished);
+    connect(ui->lightenPercentage, &EnterSpinBox::editingFinished, this, &MainWindow::on_darkenPercentage_editingFinished);
+
 }
 
 MainWindow::~MainWindow() {
@@ -360,4 +364,84 @@ void MainWindow::on_infraredBtn_clicked() {
     // Update Image
     ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
 }
+
+
+
+// Darken & Lighten Filter
+
+// Darken & Lighten Button Functionality
+void MainWindow::on_darkenAndLightenBtn_clicked() {
+    // Change to Darken and Lighten Filter Navigation
+    ui -> FooterNavigationStackedWidget -> setCurrentIndex(3);
+}
+
+// Darken Algorithm
+void darkFilter(Image &image, float percentage) {
+    int dark;
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            for (int k = 0; k < 3; ++k) {
+                dark = image(i, j, k);
+                if (image(i, j, k) > (dark * (percentage / 100)))
+                    image(i, j, k) -= (dark * (percentage / 100));
+                else
+                    image(i, j, k) = 0;
+            }
+        }
+    }
+}
+
+// Lighten Algorithm
+void lightFilter(Image &image, float percentage){
+    int light;
+
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            for (int k = 0; k < 3; ++k) {
+                light = image(i, j, k);
+                if(image(i,j,k) + (light * (percentage / 100)) < 255)
+                    image(i, j, k) += (light * (percentage / 100));
+                else
+                    image(i,j,k) = 255;
+            }
+        }
+    }
+}
+
+// Darken Button Functionality
+void MainWindow::on_darkenBtn_clicked() {
+    // Change to darken configuration footer
+    ui -> FooterNavigationStackedWidget -> setCurrentIndex(4);
+}
+
+// Lighten Button Functionality
+void MainWindow::on_lightenBtn_clicked() {
+    // Change to lighten configuration footer
+    ui -> FooterNavigationStackedWidget -> setCurrentIndex(5);
+}
+
+// Darken Percentage Spinbox Functionality
+void MainWindow::on_darkenPercentage_editingFinished() {
+    int percentage = ui->darkenPercentage->value();
+
+    // Apply filter on image
+    darkFilter(image, percentage);
+
+    // Update Image
+    ui->imageDisplay->setPixmap(updatedImageDisplay(image).scaledToWidth(std::min(ui->imageDisplay->width() * 5, 400), Qt::SmoothTransformation));
+}
+
+// Lighten Percentage Spinbox Functionality
+void MainWindow::on_lightenPercentage_editingFinished() {
+    int percentage = ui->lightenPercentage->value();
+
+    // Apply filter on image
+    lightFilter(image, percentage);
+
+    // Update Image
+    ui->imageDisplay->setPixmap(updatedImageDisplay(image).scaledToWidth(std::min(ui->imageDisplay->width() * 5, 400), Qt::SmoothTransformation));
+}
+
+
+
 
