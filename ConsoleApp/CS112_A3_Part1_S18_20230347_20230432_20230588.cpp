@@ -9,7 +9,7 @@ Author3 (name - ID - Group - Section - Email):	Mohamed Ali Hassan Amin          
 Teaching Assistant:		    Ahmed Foad Lotfy
 Who did what:
     Hassan Ali:         Main Menu, Image Input Function, Image Save Function, Filter Selection Function, Invert Image Filter, Image Rotation Filters, Frame Filter, Blur Filter, Skew Filter.
-    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Merge Configuration, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter, Oil Painting Filter, Saturation Configuration, Constrast Configuration.
+    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Merge Configuration, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter, Oil Painting Filter, Old TV filter, Saturation Configuration, Constrast Configuration.
     Mohamed Ali:        Grayscale Filter, Merge Image Filter (INCOMPLETE), Lighten & Darken Image Filters, Edge Detection Filter, Purple Filter, Infrared Filter.
  */
 
@@ -1298,6 +1298,27 @@ void oilPainting(Image &image){
 // Old TV Filter
 void oldTVFilter(Image &image){
 
+    // Create a random number generator
+    random_device rd;
+    mt19937 generator(rd());
+
+    // Create uniform distribution
+    uniform_real_distribution<> distribution(-30, 30);
+
+    for (int row = 0; row < image.width; ++row) {
+        for (int col = 0; col < image.height; ++col) {
+            // Generate random noise for each channel
+            double noiseR = distribution(generator);
+            double noiseG = distribution(generator);
+            double noiseB = distribution(generator);
+
+            // Add noise to all channels
+            image(row, col, 0) = min(image(row, col, 0) + noiseR, 255.0);
+            image(row, col, 1) = min(image(row, col, 1) + noiseG, 255.0);
+            image(row, col, 2) = min(image(row, col, 2) + noiseB, 255.0);
+        }
+    }
+    darkFilter(image, 5);
 }
 
 // Skew Filter
