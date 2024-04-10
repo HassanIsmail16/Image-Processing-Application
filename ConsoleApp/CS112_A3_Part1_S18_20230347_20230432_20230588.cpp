@@ -10,7 +10,7 @@ Teaching Assistant:		    Ahmed Foad Lotfy
 Who did what:
     Hassan Ali:         Main Menu, Image Input Function, Image Save Function, Filter Selection Function, Invert Image Filter, Image Rotation Filters, Frame Filter, Blur Filter, Skew Filter.
     Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Merge Configuration, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter, Oil Painting Filter, Old TV filter, Saturation Configuration, Constrast Configuration.
-    Mohamed Ali:        Grayscale Filter, Merge Image Filter (INCOMPLETE), Lighten & Darken Image Filters, Edge Detection Filter, Purple Filter, Infrared Filter.
+    Mohamed Ali:        Grayscale Filter, Merge Image Filter, Lighten & Darken Image Filters, Edge Detection Filter, Sunlight Filter, Purple Filter, Infrared Filter.
  */
 
 #include <bits/stdc++.h>
@@ -94,7 +94,8 @@ void purpleFilter(Image &image);
 void infraredFilter(Image &image);
 
 // Oil Painting Filter
-void oilPainting(Image &image);
+void oilPainting(Image &image, int radius);
+int getRadius();
 
 // Old TV Filter
 void oldTVFilter(Image &image);
@@ -357,7 +358,8 @@ void filterSelection() {
                 break;
             }
             case 14: {
-                oilPainting(image);
+                int radius = getRadius();
+                oilPainting(image, radius);
                 break;
             }
             case 15: {
@@ -525,7 +527,7 @@ void blackAndWhiteFilter(Image &image){
 }
 
 // Image Inversion Filter
-    void invertImage(Image &image) {
+void invertImage(Image &image) {
         // Subtracts the current channel value from 255
         for (int x = 0; x < image.width; x++) {
             for (int y = 0; y < image.height; y++) {
@@ -661,12 +663,6 @@ void rotate270(Image &image) {
 // Darken and Lighten Image
 void darkFilter(Image &image, float percentage) {
     int dark;
-
-    if(percentage < 0 || percentage > 100){
-        cout << "Invalid number!" << el << "Please enter a number from 0 to 100!" << el;
-        return;
-    }
-
     for (int i = 0; i < image.width; ++i) {
         for (int j = 0; j < image.height; ++j) {
             for (int k = 0; k < 3; ++k) {
@@ -682,12 +678,6 @@ void darkFilter(Image &image, float percentage) {
 
 void lightFilter(Image &image, float percentage){
     int light;
-
-    if(percentage < 0 || percentage > 100){
-        cout << "Invalid number!" << el << "Please enter a number from 0 to 100!" << el;
-        return;
-    }
-
     for (int i = 0; i < image.width; ++i) {
         for (int j = 0; j < image.height; ++j) {
             for (int k = 0; k < 3; ++k) {
@@ -1238,9 +1228,32 @@ void infraredFilter(Image &image){
 }
 
 // Oil Painting Filter
-void oilPainting(Image &image){
+int getRadius(){
+    // Get radius
+    cout << "Please enter the intensity of the oil painting fitler between 1 and 10" << el;
+    string strRadius;
+    cin >> strRadius;
+
+    // Validate input
+    if (!isInteger(strRadius)){
+        cout << "Invalid Input. Please enter a valid integer" << el;
+        cout << "-------------------------------------" << el;
+        return getRadius();
+    }
+
+    // Validate radius
+    int radius = stoi(strRadius);
+    if (radius <= 0 || radius > 10){
+        cout << "Invalid Input. Please enter an integer between 1 and 10" << el;
+        cout << "-------------------------------------" << el;
+        return getRadius();
+    }
+
+    return radius;
+}
+void oilPainting(Image &image, int radius){
     Image result(image.width, image.height);
-    int radius = 5, intensityLevels = 20;
+    int intensityLevels = 20;
 
     for (int row = 0; row < image.width; ++row) {
         for (int col = 0; col < image.height; ++col) {
@@ -1248,8 +1261,8 @@ void oilPainting(Image &image){
 
             // Track the RGB values for each intensity level and the count of each intensity level.
             int sumR[21] = {0}, sumG[21] = {0}, sumB[21] = {0}, levelCount[21] = {0};
-            int cappedIntensity = 0;
-            double realIntensity = 0;
+            double realIntensity = 0, cappedIntensity;
+            int intCappedIntensity;
             for (int i = - radius; i <= radius; ++i) {
                 for (int j = - radius; j <= radius; ++j) {
 
@@ -1262,16 +1275,17 @@ void oilPainting(Image &image){
                         // Real intensity is the average of the RGB Channels
                         realIntensity = (double) (image(currentX, currentY, 0) + image(currentX, currentY, 1) + image(currentX, currentY, 2)) / 3;
                         // Divide the intensity to a certain amount of levels so that the intensity level falls between 1 and number of intensity level.
-                        cappedIntensity = (realIntensity * intensityLevels) / 255;
+                        cappedIntensity = ceil((realIntensity * intensityLevels) / 255);
+                        intCappedIntensity = int(cappedIntensity);
 
                         /* Count the frequency of each intensity level
                          * Calculate the sum of RGB values to be able to calculate the average later.
                          * All data for an intensity level is stored at index = intensity level.
                          */
-                        levelCount[cappedIntensity]++;
-                        sumR[cappedIntensity] += image(currentX, currentY, 0);
-                        sumG[cappedIntensity] += image(currentX, currentY, 1);
-                        sumB[cappedIntensity] += image(currentX, currentY, 2);
+                        levelCount[intCappedIntensity]++;
+                        sumR[intCappedIntensity] += image(currentX, currentY, 0);
+                        sumG[intCappedIntensity] += image(currentX, currentY, 1);
+                        sumB[intCappedIntensity] += image(currentX, currentY, 2);
                     }
                 }
             }
