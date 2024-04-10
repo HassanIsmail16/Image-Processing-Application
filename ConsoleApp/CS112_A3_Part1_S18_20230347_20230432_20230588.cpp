@@ -9,8 +9,8 @@ Author3 (name - ID - Group - Section - Email):	Mohamed Ali Hassan Amin          
 Teaching Assistant:		    Ahmed Foad Lotfy
 Who did what:
     Hassan Ali:         Main Menu, Image Input Function, Image Save Function, Filter Selection Function, Invert Image Filter, Image Rotation Filters, Frame Filter, Blur Filter, Skew Filter.
-    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter, Oil Painting Filter, Saturation Configuration, Constrast Configuration.
-    Mohamed Ali:        Grayscale Filter, Merge Image Filter (INCOMPLETE), Lighten & Darken Image Filters, Edge Detection Filter, Purple Filter, Infrared Filter.
+    Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Merge Configuration, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter, Oil Painting Filter, Old TV filter, Saturation Configuration, Constrast Configuration.
+    Mohamed Ali:        Grayscale Filter, Merge Image Filter, Lighten & Darken Image Filters, Edge Detection Filter, Sunlight Filter, Purple Filter, Infrared Filter.
  */
 
 #include <bits/stdc++.h>
@@ -39,7 +39,9 @@ void blackAndWhiteFilter(Image &image);
 void invertImage(Image &image);
 
 // Image Merging
-void mergeFilter(Image &image);
+void mergeFilter(Image &image, Image &image2);
+void mergeFilter2(Image &image, Image &image2, Image &result);
+void mergeConfiguration(Image &image, Image &image2);
 
 // Flip Image
 void flipImageHorizontally(Image &image);
@@ -92,10 +94,11 @@ void purpleFilter(Image &image);
 void infraredFilter(Image &image);
 
 // Oil Painting Filter
-void oilPainting(Image &image);
+void oilPainting(Image &image, int radius);
+int getRadius();
 
-// CRT Filter
-void CRTfilter(Image &image);
+// Old TV Filter
+void oldTVFilter(Image &image);
 
 // Skew Filter
 pair<double, int> getSkewAngle();
@@ -109,7 +112,7 @@ struct RGB{
 struct HSL{
     double h, s, l;
 };
-double saturationConfiguration();
+double getPercentage();
 HSL rgbToHsl(RGB rgbColor);
 RGB hslToRgb(HSL hslColor);
 void changeSaturation(Image &image, double changePercentage);
@@ -187,7 +190,7 @@ void filterSelection() {
              << "1) Grayscale Conversion" << el
              << "2) Black and White" << el
              << "3) Invert Image" << el
-             << "4) Merge Images" << space << "(NOT COMPLETE)" << el
+             << "4) Merge Images" << space << el
              << "5) Flip Image" << el
              << "6) Rotate Image" << el
              << "7) Darken and Lighten Image" << el
@@ -195,7 +198,7 @@ void filterSelection() {
              << "9) Adding a Frame to the Picture" << el
              << "10) Detect Image Edges" << el
              << "11) Resizing Images" << el
-             << "12) Blur Images" << space << "(NOT ADDED YET)" << el
+             << "12) Blur Images" << space << el
              << "14) Oil Painting Filter" << el
              << "16) Purple Filter" << space << el
              << "17) Infrared Filter" << space << el
@@ -203,7 +206,7 @@ void filterSelection() {
              << "12) Blur Image" << el
              << "13) Make image warmer (Land of Wano)" << el
              << "14) Apply The Oil Painting Effect" << el
-             << "15) CRT Filter (TV Effect)" << el
+             << "15) Old TV Filter" << el
              << "16) Purple Overlay" << el
              << "17) Infrared Filter" << el
              << "18) Skew Image" << el
@@ -229,7 +232,15 @@ void filterSelection() {
                 break;
             }
             case 4: {
-                mergeFilter(image);
+                cout << "First Image Dimensions: " << image.width << " x " << image.height << el
+                     << "Please insert the second image to merge" << el;
+                Image image2 = imageInput();
+                if (image.width == image2.width && image.height == image2.height){
+                    mergeFilter(image, image2);
+                }
+                else {
+                    mergeConfiguration(image, image2);
+                }
                 break;
             }
             case 5: {
@@ -281,33 +292,21 @@ void filterSelection() {
                 break;
             }
             case 7: {
-                cout << "Please select one of the following choices:" << el
-                     << "1) Darken Image" << el
-                     << "2) Lighten Image" << el;
-
                 // Input
-                int darkOrLightChoice = choiceSelection({1, 2});
-                int percentage;
+                cout << "Please enter the change percentage (+ve to lighten the image or -ve to darken the image):" << el;
+                int percentage = getPercentage();
 
-                switch (darkOrLightChoice) {
-                    case 1:
-                        cout << "Enter a number from 0 - 100 to dark the image" << el;
-                        cin >> percentage;
-                        cin.clear();
-                        cin.ignore();
-                        darkFilter(image, percentage);
-                        break;
-                    case 2:
-                        cout << "Enter a number from 0 - 100 to light the image" << el;
-                        cin >> percentage;
-                        cin.clear();
-                        cin.ignore();
-                        lightFilter(image, percentage);
-                        break;
-                    default:
-                        cout << "Invalid Choice. Please select 1 or 2..." << el;
-                        cout << "-------------------------------------" << el;
-                        break;
+                if (percentage == 0){
+                    break;
+                }
+                else if (percentage > 0){
+                    lightFilter(image, percentage);
+                    break;
+                }
+                else{
+                    percentage = abs(percentage);
+                    darkFilter(image, percentage);
+                    break;
                 }
                 break;
             }
@@ -359,11 +358,12 @@ void filterSelection() {
                 break;
             }
             case 14: {
-                oilPainting(image);
+                int radius = getRadius();
+                oilPainting(image, radius);
                 break;
             }
             case 15: {
-                // CRT Filter TV Effect
+                oldTVFilter(image);
                 break;
             }
             case 16: {
@@ -379,7 +379,8 @@ void filterSelection() {
                 break;
             }
             case 19: {
-                double changePercentage = saturationConfiguration();
+                cout << "Please enter the change percentage (+ve to increase saturation or -ve to decrease saturation):" << el;
+                double changePercentage = getPercentage();
                 changeSaturation(image, changePercentage);
                 break;
             }
@@ -526,7 +527,7 @@ void blackAndWhiteFilter(Image &image){
 }
 
 // Image Inversion Filter
-    void invertImage(Image &image) {
+void invertImage(Image &image) {
         // Subtracts the current channel value from 255
         for (int x = 0; x < image.width; x++) {
             for (int y = 0; y < image.height; y++) {
@@ -538,26 +539,64 @@ void blackAndWhiteFilter(Image &image){
     }
 
 // Merge Filter
-void mergeFilter(Image &image) {
-    cout << "Insert a second image to merge" << el;
-    Image imageToMerge = imageInput();
+void mergeFilter(Image &image, Image &image2) {
+    unsigned int merge = 0;
+    // Averages each two corresponding pixels from the two images
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            for (int k = 0; k < 3; ++k) {
+                merge = image(i, j, k) + image2(i, j, k);
+                image(i, j, k) = merge / 2;
+            }
+            merge = 0;
+        }
+    }
+}
+
+// Merge the common parts of the 2 images into a third image.
+void mergeFilter2(Image &image, Image &image2, Image &result){
 
     unsigned int merge = 0;
-
     // Averages each two corresponding pixels from the two images
-    if (image.width == imageToMerge.width && image.height == imageToMerge.height) {
-        for (int i = 0; i < image.width; ++i) {
-            for (int j = 0; j < image.height; ++j) {
-                for (int k = 0; k < 3; ++k) {
-                    merge = image(i, j, k) + imageToMerge(i, j, k);
-                    image(i, j, k) = merge / 2;
-                }
-                merge = 0;
+    for (int i = 0; i < result.width; ++i) {
+        for (int j = 0; j < result.height; ++j) {
+            for (int k = 0; k < 3; ++k) {
+                merge = image(i, j, k) + image2(i, j, k);
+                result(i, j, k) = merge / 2;
             }
+            merge = 0;
         }
-    } else {
-        cout << "Please resize the images to merge." << el;
-        return;
+    }
+
+    image = result;
+}
+
+void mergeConfiguration(Image &image, Image &image2){
+    cout << "First Image Dimensions: " << image.width << " x " << image.height << el
+         << "Second Image Dimensions: " << image2.width << " x " << image2.height << el
+         << "The two images appear to have different dimensions, what would you like to do?" << el
+         << "1) Resize both images to the biggest width and biggest height." << el
+         << "2) Merge the common area between the smaller width and smaller height." << el;
+
+    int choice = choiceSelection({1, 2});
+    switch (choice) {
+        case 1:{
+            int maxWidth = max(image.width, image2.width);
+            int maxHeight = max(image.height, image2.height);
+            resizeImage(image, maxWidth, maxHeight);
+            resizeImage(image2, maxWidth, maxHeight);
+            mergeFilter(image, image2);
+        }
+        case 2:{
+            int minWidth = min(image.width, image2.width);
+            int minHeight = min(image.height, image2.height);
+            Image result(minWidth, minHeight);
+            mergeFilter2(image, image2, result);
+        }
+        default:
+            cout << "Invalid Choice. Please select 1 or 2..." << el;
+            cout << "-------------------------------------" << el;
+            break;
     }
 }
 
@@ -624,12 +663,6 @@ void rotate270(Image &image) {
 // Darken and Lighten Image
 void darkFilter(Image &image, float percentage) {
     int dark;
-
-    if(percentage < 0 || percentage > 100){
-        cout << "Invalid number!" << el << "Please enter a number from 0 to 100!" << el;
-        return;
-    }
-
     for (int i = 0; i < image.width; ++i) {
         for (int j = 0; j < image.height; ++j) {
             for (int k = 0; k < 3; ++k) {
@@ -645,12 +678,6 @@ void darkFilter(Image &image, float percentage) {
 
 void lightFilter(Image &image, float percentage){
     int light;
-
-    if(percentage < 0 || percentage > 100){
-        cout << "Invalid number!" << el << "Please enter a number from 0 to 100!" << el;
-        return;
-    }
-
     for (int i = 0; i < image.width; ++i) {
         for (int j = 0; j < image.height; ++j) {
             for (int k = 0; k < 3; ++k) {
@@ -1201,9 +1228,32 @@ void infraredFilter(Image &image){
 }
 
 // Oil Painting Filter
-void oilPainting(Image &image){
+int getRadius(){
+    // Get radius
+    cout << "Please enter the intensity of the oil painting fitler between 1 and 10" << el;
+    string strRadius;
+    cin >> strRadius;
+
+    // Validate input
+    if (!isInteger(strRadius)){
+        cout << "Invalid Input. Please enter a valid integer" << el;
+        cout << "-------------------------------------" << el;
+        return getRadius();
+    }
+
+    // Validate radius
+    int radius = stoi(strRadius);
+    if (radius <= 0 || radius > 10){
+        cout << "Invalid Input. Please enter an integer between 1 and 10" << el;
+        cout << "-------------------------------------" << el;
+        return getRadius();
+    }
+
+    return radius;
+}
+void oilPainting(Image &image, int radius){
     Image result(image.width, image.height);
-    int radius = 5, intensityLevels = 20;
+    int intensityLevels = 20;
 
     for (int row = 0; row < image.width; ++row) {
         for (int col = 0; col < image.height; ++col) {
@@ -1211,8 +1261,8 @@ void oilPainting(Image &image){
 
             // Track the RGB values for each intensity level and the count of each intensity level.
             int sumR[21] = {0}, sumG[21] = {0}, sumB[21] = {0}, levelCount[21] = {0};
-            int cappedIntensity = 0;
-            double realIntensity = 0;
+            double realIntensity = 0, cappedIntensity;
+            int intCappedIntensity;
             for (int i = - radius; i <= radius; ++i) {
                 for (int j = - radius; j <= radius; ++j) {
 
@@ -1225,16 +1275,17 @@ void oilPainting(Image &image){
                         // Real intensity is the average of the RGB Channels
                         realIntensity = (double) (image(currentX, currentY, 0) + image(currentX, currentY, 1) + image(currentX, currentY, 2)) / 3;
                         // Divide the intensity to a certain amount of levels so that the intensity level falls between 1 and number of intensity level.
-                        cappedIntensity = (realIntensity * intensityLevels) / 255;
+                        cappedIntensity = ceil((realIntensity * intensityLevels) / 255);
+                        intCappedIntensity = int(cappedIntensity);
 
                         /* Count the frequency of each intensity level
                          * Calculate the sum of RGB values to be able to calculate the average later.
                          * All data for an intensity level is stored at index = intensity level.
                          */
-                        levelCount[cappedIntensity]++;
-                        sumR[cappedIntensity] += image(currentX, currentY, 0);
-                        sumG[cappedIntensity] += image(currentX, currentY, 1);
-                        sumB[cappedIntensity] += image(currentX, currentY, 2);
+                        levelCount[intCappedIntensity]++;
+                        sumR[intCappedIntensity] += image(currentX, currentY, 0);
+                        sumG[intCappedIntensity] += image(currentX, currentY, 1);
+                        sumB[intCappedIntensity] += image(currentX, currentY, 2);
                     }
                 }
             }
@@ -1256,6 +1307,32 @@ void oilPainting(Image &image){
     }
 
     image = result;
+}
+
+// Old TV Filter
+void oldTVFilter(Image &image){
+
+    // Create a random number generator
+    random_device rd;
+    mt19937 generator(rd());
+
+    // Create uniform distribution
+    uniform_real_distribution<> distribution(-30, 30);
+
+    for (int row = 0; row < image.width; ++row) {
+        for (int col = 0; col < image.height; ++col) {
+            // Generate random noise for each channel
+            double noiseR = distribution(generator);
+            double noiseG = distribution(generator);
+            double noiseB = distribution(generator);
+
+            // Add noise to all channels
+            image(row, col, 0) = min(image(row, col, 0) + noiseR, 255.0);
+            image(row, col, 1) = min(image(row, col, 1) + noiseG, 255.0);
+            image(row, col, 2) = min(image(row, col, 2) + noiseB, 255.0);
+        }
+    }
+    darkFilter(image, 5);
 }
 
 // Skew Filter
@@ -1327,22 +1404,28 @@ void skewImage(Image &image) {
 }
 
 // Saturation
-double saturationConfiguration(){
+double getPercentage(){
     // Get change percentage
-    cout << "Please enter the change percentage (+ve to increase saturation or -ve to decrease saturation):" << el;
     string strChangePercentage;
     getline(cin, strChangePercentage);
 
-    // Validate change percentage
+    // Validate input
     regex number(R"([-]*(\d+)[.]*(\d+))");
-    if (regex_match(strChangePercentage, number)){
-        return stod(strChangePercentage);
-    }
-    else {
+    if (!regex_match(strChangePercentage, number)){
         cout << "Invalid Input. Please enter a valid number." << el;
         cout << "-------------------------------------" << el;
-        return saturationConfiguration();
+        return getPercentage();
     }
+
+    // Validate change percentage value
+    double changePercentage = stod(strChangePercentage);
+    if (changePercentage < -100 || changePercentage > 100){
+        cout << "Invalid Input. Please enter a number within the range -100 and 100." << el;
+        cout << "-------------------------------------" << el;
+        return getPercentage();
+    }
+
+    return changePercentage;
 }
 
 HSL rgbToHsl(RGB rgbColor){
