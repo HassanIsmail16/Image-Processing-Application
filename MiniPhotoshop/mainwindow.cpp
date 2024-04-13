@@ -778,3 +778,90 @@ void MainWindow::on_tvBtn_clicked()
 }
 
 
+// Flip Image
+void flipImageHorizontally(Image &image){
+    // Initialize a copy of the original image
+    Image copy(image.width, image.height);
+    copyImage(image, copy);
+
+    // Loop through all pixels
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            // fill the image from right to left.
+            for (int k = 0; k < image.channels; ++k) {
+                image(i, j, k) = copy(image.width - 1 - i, j, k);
+            }
+        }
+    }
+}
+
+void flipImageVertically(Image &image){
+    // Initialize a copy of the original image
+    Image copy(image.width, image.height);
+    copyImage(image, copy);
+
+    // Loop through all pixels
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            // fill the image from bottom to top.
+            for (int k = 0; k < image.channels; ++k) {
+                image(i, j, k) = copy(i, image.height - 1 - j, k);
+            }
+        }
+    }
+}
+
+
+// Rotate Button Functionality
+void MainWindow::on_rotateBtn_clicked() {
+    ui -> FooterNavigationStackedWidget -> setCurrentIndex(8);
+    footerWidgetStates.push_back(9);
+}
+
+
+void rotate90(Image &image) {
+    // Rotates the image using the flipping and a specific traversal pattern
+    Image result(image.height, image.width);
+    for (int row = 0; row < image.height; row++) {
+        for (int col = 0; col < image.width; col++) {
+            for (int channel = 0; channel < image.channels; channel++) {
+                result(row, col, channel) = image(col, row, channel);
+            }
+        }
+    }
+    flipImageHorizontally(result);
+    image = result;
+}
+
+void rotate180(Image &image) {
+    // Flips the image two times to rotate by 180 degrees
+    flipImageVertically(image);
+    flipImageHorizontally(image);
+}
+
+void rotate270(Image &image) {
+    // Rotates it 180 + 90 to get 270 rotation
+    rotate180(image);
+    rotate90(image);
+}
+
+void MainWindow::on_rotate90_clicked() {
+    rotate90(image);
+
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+}
+
+
+void MainWindow::on_rotate180_clicked() {
+    rotate180(image);
+
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+}
+
+
+void MainWindow::on_rotate270_clicked() {
+    rotate270(image);
+
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+}
+
