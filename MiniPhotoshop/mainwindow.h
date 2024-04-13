@@ -70,6 +70,8 @@ private slots:
 
     void updateStyleSheet();
 
+    void on_saveImage_clicked();
+
 private:
     Ui::MainWindow *ui;
 
