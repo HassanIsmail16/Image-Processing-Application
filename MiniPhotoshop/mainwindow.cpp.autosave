@@ -488,12 +488,6 @@ void MainWindow::on_lightenApplyBtn_clicked() {
 
 // Blur Filter
 
-// Blur UI Button Functionality
-void MainWindow::on_blurBtn_clicked() {
-    // Change Footer Navigation to Blur Configuration
-    ui -> FooterNavigationStackedWidget -> setCurrentIndex(6);
-}
-
 // Blur Filter Algorithm Functions
 double gaussianModel(double x, double y, double standardDeviation) {
     // Does the Gaussian equation for kernel construction
@@ -503,14 +497,14 @@ double gaussianModel(double x, double y, double standardDeviation) {
 
 vector<vector<double>> constructGaussianKernel(double kernelSize, double standardDeviation) {
     vector<vector<double>> gaussianKernel(kernelSize, vector<double>(kernelSize, 0));
-
+    
     // Gets the weights of the kernel for each cell
     for (int x = 0; x < (int) kernelSize; x++) {
         for (int y = 0; y < (int) kernelSize; y++) {
             gaussianKernel[x][y] = gaussianModel(x - ((kernelSize - 1) / 2), y - ((kernelSize - 1) / 2), standardDeviation);
         }
     }
-
+    
     return gaussianKernel;
 }
 
@@ -524,35 +518,35 @@ Image kernelConvolution(Image &image, double kernelSize, const vector<vector<dou
     // Creates a copy of the image to be blurred
     Image blurredImage(image.width, image.height);
     copyImage(image, blurredImage);
-
+    
     // Gets the center of the kernel
     int center = (int) (kernelSize - 1) / 2;
-
+    
     // Loops over the image
     for (int row = 0; row < image.height; row++) {
         for (int col = 0; col < image.width; col++) {
             // Initializes the kernel weight sum to normalize the blur values and initializes the blur value for each channel at 0
             double kernelWeightSum = 0, currentPixelR = 0, currentPixelG = 0, currentPixelB = 0;
-
+            
             // Loops over each cell of the kernel
             for (int i = 0; i < kernelSize; i++) {
                 for (int j = 0; j < kernelSize; j++) {
                     // Gets the pixel that corresponds with the ith row and jth column of the kernel around the current image pixel
                     int x = col - center + i, y = row - center + j;
-
+                    
                     // Checks if there exists a corresponding pixel for the current kernel cell inside the image
                     if (x >= 0 && x < image.width && y >= 0 && y < image.height) {
                         // Gets the resulting blur values for each of the 3 color channels
                         currentPixelR += getConvolutedCell(image(x, y, 0), i, j, gaussianKernel);
                         currentPixelG += getConvolutedCell(image(x, y, 1), i, j, gaussianKernel);
                         currentPixelB += getConvolutedCell(image(x, y, 2), i, j, gaussianKernel);
-
+                        
                         // Gets the weight sum of the used kernel to be used in normalization
                         kernelWeightSum += gaussianKernel[i][j];
                     }
                 }
             }
-
+            
             // Adjusts the new pixel values
             blurredImage.setPixel(col, row, 0, currentPixelR / kernelWeightSum);
             blurredImage.setPixel(col, row, 1, currentPixelG / kernelWeightSum);
@@ -562,43 +556,9 @@ Image kernelConvolution(Image &image, double kernelSize, const vector<vector<dou
     return blurredImage;
 }
 
-void gaussianBlur(Image &image, double kernelSize) {
-    // Gets standard deviation for kernel construction
-    double standardDeviation = kernelSize / (2.0 * sqrt(2.0 * log(2.0)));
 
-    // Constructs the kernel
-    vector<vector<double>> gaussianKernel = constructGaussianKernel(kernelSize, standardDeviation);
 
-    // Does the kernel convolution process to the image to blur it
-    image = kernelConvolution(image, kernelSize, gaussianKernel);
-}
-
-// Blur Slider Functionality
 void MainWindow::on_blurSlider_valueChanged(int value) {
-    // Update label
-    ui -> blurValueLabel -> setText(QString::number(value));
-
-    // Create a temp image for previewing the effect
-    Image tempImage(image.width, image.height);
-    copyImage(image, tempImage);
-
-    // Apply the effect on temp image
-    gaussianBlur(tempImage, value);
-
-    // Display temp image
-    ui -> imageDisplay -> setPixmap(updatedImageDisplay(tempImage).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+    
 }
-
-// Blur apply button functionality
-void MainWindow::on_blurApplyBtn_clicked() {
-    // Apply filter
-    gaussianBlur(image, ui -> blurSlider -> value());
-
-    // Display image
-    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
-
-    // Reset slider value
-    ui -> blurSlider -> setValue(1);
-}
-
 

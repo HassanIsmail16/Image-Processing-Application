@@ -46,11 +46,21 @@ private slots:
 
     void on_darkenBtn_clicked();
 
-    void on_darkenPercentage_editingFinished();
-
     void on_lightenBtn_clicked();
 
-    void on_lightenPercentage_editingFinished();
+    void on_darkenSlider_valueChanged(int value);
+
+    void on_darkenApplyBtn_clicked();
+
+    void on_lightenSlider_valueChanged(int value);
+
+    void on_lightenApplyBtn_clicked();
+
+    void on_blurSlider_valueChanged(int value);
+
+    void on_blurApplyBtn_clicked();
+
+    void on_blurBtn_clicked();
 
 private:
     Ui::MainWindow *ui;
