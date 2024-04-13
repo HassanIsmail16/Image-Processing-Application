@@ -77,7 +77,7 @@ void copyImage(Image &source, Image &destination){
 // Open Image Button Welcome Screen
 void MainWindow::on_openImage_clicked() {
     // Gets image from user
-    filename = QFileDialog::getOpenFileName(this, tr("Select an image to be edited"), QDir::homePath(), "Images (*.png *.bmp *.jpg *.jpeg)");
+    filename = QFileDialog::getOpenFileName(this, tr("Load Image"), QDir::homePath(), "Images (*.png *.bmp *.jpg *.jpeg)");
 
     // Makes sure that the input is valid and loads the image
     if (!filename.isEmpty()) {
@@ -123,6 +123,43 @@ void MainWindow::on_globalBackBtn_clicked() {
 // Save image button functionality
 void MainWindow::on_saveImage_clicked() {
     QString savePath = QFileDialog::getSaveFileName(this, tr("Save Image"), QDir::homePath(), tr("Images (*.png *.jpg *.jpeg *.bmp)"));
+
+    // Check if the user selected a file
+    if (!savePath.isEmpty()) {
+        // User selected a file, perform save operation
+        QPixmap pixmap(filename); // Example pixmap, replace with your own image
+        // Convert QPixmap to QImage
+        QImage image = pixmap.toImage();
+
+        // Save the QImage to the selected file
+        if (image.save(savePath)) {
+            // Image saved successfully
+            QMessageBox::information(this, tr("Success"), tr("Image saved successfully."));
+        } else {
+            // Error saving image
+            QMessageBox::critical(this, tr("Error"), tr("Failed to save image."));
+        }
+    }
+}
+
+// Load image button functionality
+void MainWindow::on_loadImage_clicked() {
+    QMessageBox messageBox;
+    messageBox.setText("Do you want to save before loading a new image?");
+    messageBox.addButton(tr("Save"), QMessageBox::AcceptRole);
+    messageBox.addButton(tr("Don't Save"), QMessageBox::RejectRole);
+    messageBox.addButton(tr("Cancel"), QMessageBox::RejectRole);
+
+    int choice = messageBox.exec();
+
+    if (choice == QMessageBox::AcceptRole) {
+        on_saveImage_clicked();
+        on_openImage_clicked();
+    } else if (choice == QMessageBox::RejectRole) {
+        on_openImage_clicked();
+    } else {
+        return;
+    }
 }
 
 // Effects button functionality
@@ -739,4 +776,5 @@ void MainWindow::on_tvBtn_clicked()
     ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
 
 }
+
 

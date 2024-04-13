@@ -21,7 +21,7 @@
     <item row="0" column="0">
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="welcomeScreen0">
        <widget class="QLabel" name="Heading">
@@ -304,7 +304,7 @@ border-radius: 25px;</string>
               </size>
              </property>
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="footer0">
               <layout class="QGridLayout" name="gridLayout_7">
@@ -1415,7 +1415,7 @@ border-radius: 15px;</string>
                        <number>1</number>
                       </property>
                       <property name="maximum">
-                       <number>10</number>
+                       <number>20</number>
                       </property>
                       <property name="singleStep">
                        <number>1</number>
