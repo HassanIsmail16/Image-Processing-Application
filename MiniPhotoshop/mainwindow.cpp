@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QImage>
+#include <QTimer>
 
 #define el "\n"
 #define space " "
@@ -17,6 +18,19 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow) {
     ui->setupUi(this);
+
+    // Create a QTimer
+    timer = new QTimer(this);
+
+    // Connect the timeout() signal to the slot that updates the stylesheet
+    connect(timer, &QTimer::timeout, this, &MainWindow::updateStyleSheet);
+
+    // Set the interval for the timer (in milliseconds)
+    int interval = 300; // 1000 milliseconds = 1 second
+    timer->setInterval(interval);
+
+    // Start the timer
+    timer->start();
 }
 
 MainWindow::~MainWindow() {
@@ -58,6 +72,29 @@ void copyImage(Image &source, Image &destination){
 
 // UI Functionality
 
+
+// Global Back Button Functionality
+deque<int> footerWidgetStates;
+
+// Slot implementation to update background color based on condition
+void MainWindow::updateStyleSheet() {
+    if (footerWidgetStates.size() > 1) {
+        ui->globalBackBtn->setStyleSheet("border-radius: 6px; background-color: #ffffff; color: #000000;");
+        ui->globalBackBtn->setCursor(Qt::PointingHandCursor);
+    } else {
+        ui->globalBackBtn->setStyleSheet("border-radius: 6px; background-color: #787878; color: #000000;");
+        ui->globalBackBtn->setCursor(Qt::ArrowCursor);
+
+    }
+}
+
+void MainWindow::on_globalBackBtn_clicked() {
+    if (footerWidgetStates.size() > 1) {
+        footerWidgetStates.pop_back();
+        ui -> FooterNavigationStackedWidget -> setCurrentIndex(footerWidgetStates.back());
+    }
+}
+
 // Open Image Button Welcome Screen
 void MainWindow::on_openImage_clicked() {
     // Gets image from user
@@ -79,6 +116,7 @@ void MainWindow::on_openImage_clicked() {
 
         // Switch to main page
         ui -> stackedWidget -> setCurrentIndex(1);
+        footerWidgetStates.push_back(0);
     }
 }
 
@@ -86,19 +124,20 @@ void MainWindow::on_openImage_clicked() {
 void MainWindow::on_effectsBtn_clicked() {
     // Changes footer to effects navigation
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(1);
+    footerWidgetStates.push_back(1);
 }
 
 // Tools button functionality
 void MainWindow::on_toolsBtn_clicked() {
     // Changes footer to tools navigation
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(2);
+    footerWidgetStates.push_back(2);
 }
 
 // Tools back button functionality
 void MainWindow::on_backBtn_tools_clicked() {
     // Goes back to main footer navigation
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(0);
-
 }
 
 
@@ -106,7 +145,6 @@ void MainWindow::on_backBtn_tools_clicked() {
 void MainWindow::on_backBtn_fx_clicked() {
     // Goes back to main footer navigation
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(0);
-
 }
 
 
@@ -407,6 +445,7 @@ void MainWindow::on_infraredBtn_clicked() {
 void MainWindow::on_darkenAndLightenBtn_clicked() {
     // Change to Darken and Lighten Filter Navigation
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(3);
+    footerWidgetStates.push_back(3);
 }
 
 // Darken Algorithm
@@ -446,12 +485,14 @@ void lightFilter(Image &image, float percentage){
 void MainWindow::on_darkenBtn_clicked() {
     // Change to darken configuration footer
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(4);
+    footerWidgetStates.push_back(4);
 }
 
 // Lighten Button Functionality
 void MainWindow::on_lightenBtn_clicked() {
     // Change to lighten configuration footer
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(5);
+    footerWidgetStates.push_back(5);
 }
 
 // Darken value slider functionality
@@ -519,6 +560,7 @@ void MainWindow::on_lightenApplyBtn_clicked() {
 void MainWindow::on_blurBtn_clicked() {
     // Change Footer Navigation to Blur Configuration
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(6);
+    footerWidgetStates.push_back(6);
 }
 
 // Blur Filter Algorithm Functions
@@ -547,7 +589,7 @@ double getConvolutedCell(int value, int kernelX, int kernelY, const vector<vecto
     return result;
 }
 
-Image kernelConvolution(Image &image, double kernelSize, const vector<vector<double>>& gaussianKernel) {
+void kernelConvolution(Image &image, double kernelSize, const vector<vector<double>>& gaussianKernel) {
     // Creates a copy of the image to be blurred
     Image blurredImage(image.width, image.height);
     copyImage(image, blurredImage);
@@ -580,13 +622,20 @@ Image kernelConvolution(Image &image, double kernelSize, const vector<vector<dou
                 }
             }
 
-            // Adjusts the new pixel values
-            blurredImage.setPixel(col, row, 0, currentPixelR / kernelWeightSum);
-            blurredImage.setPixel(col, row, 1, currentPixelG / kernelWeightSum);
-            blurredImage.setPixel(col, row, 2, currentPixelB / kernelWeightSum);
+            // Adjusts the new pixel values only if kernelWeightSum is not zero
+            if (kernelWeightSum != 0) {
+                blurredImage.setPixel(col, row, 0, currentPixelR / kernelWeightSum);
+                blurredImage.setPixel(col, row, 1, currentPixelG / kernelWeightSum);
+                blurredImage.setPixel(col, row, 2, currentPixelB / kernelWeightSum);
+            } else {
+                // If kernelWeightSum is zero, retain the original pixel values
+                blurredImage.setPixel(col, row, 0, image(col, row, 0));
+                blurredImage.setPixel(col, row, 1, image(col, row, 1));
+                blurredImage.setPixel(col, row, 2, image(col, row, 2));
+            }
         }
     }
-    return blurredImage;
+    copyImage(blurredImage, image);
 }
 
 void gaussianBlur(Image &image, double kernelSize) {
@@ -597,7 +646,7 @@ void gaussianBlur(Image &image, double kernelSize) {
     vector<vector<double>> gaussianKernel = constructGaussianKernel(kernelSize, standardDeviation);
 
     // Does the kernel convolution process to the image to blur it
-    image = kernelConvolution(image, kernelSize, gaussianKernel);
+    kernelConvolution(image, kernelSize, gaussianKernel);
 }
 
 // Blur Slider Functionality
