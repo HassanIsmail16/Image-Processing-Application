@@ -267,9 +267,9 @@ void MainWindow::on_warmBtn_clicked() {
 // Oil Painting Filter
 
 // Oil Painting Filter Algorithm
-void oilPainting(Image &image){
+void oilPainting(Image &image, int radius){
     Image result(image.width, image.height);
-    int radius = 5, intensityLevels = 20;
+    int intensityLevels = 20;
 
     for (int row = 0; row < image.width; ++row) {
         for (int col = 0; col < image.height; ++col) {
@@ -277,8 +277,8 @@ void oilPainting(Image &image){
 
             // Track the RGB values for each intensity level and the count of each intensity level.
             int sumR[21] = {0}, sumG[21] = {0}, sumB[21] = {0}, levelCount[21] = {0};
-            int cappedIntensity = 0;
-            double realIntensity = 0;
+            double realIntensity = 0, cappedIntensity;
+            int intCappedIntensity;
             for (int i = - radius; i <= radius; ++i) {
                 for (int j = - radius; j <= radius; ++j) {
 
@@ -291,16 +291,17 @@ void oilPainting(Image &image){
                         // Real intensity is the average of the RGB Channels
                         realIntensity = (double) (image(currentX, currentY, 0) + image(currentX, currentY, 1) + image(currentX, currentY, 2)) / 3;
                         // Divide the intensity to a certain amount of levels so that the intensity level falls between 1 and number of intensity level.
-                        cappedIntensity = (realIntensity * intensityLevels) / 255;
+                        cappedIntensity = ceil((realIntensity * intensityLevels) / 255);
+                        intCappedIntensity = int(cappedIntensity);
 
                         /* Count the frequency of each intensity level
                          * Calculate the sum of RGB values to be able to calculate the average later.
                          * All data for an intensity level is stored at index = intensity level.
                          */
-                        levelCount[cappedIntensity]++;
-                        sumR[cappedIntensity] += image(currentX, currentY, 0);
-                        sumG[cappedIntensity] += image(currentX, currentY, 1);
-                        sumB[cappedIntensity] += image(currentX, currentY, 2);
+                        levelCount[intCappedIntensity]++;
+                        sumR[intCappedIntensity] += image(currentX, currentY, 0);
+                        sumG[intCappedIntensity] += image(currentX, currentY, 1);
+                        sumB[intCappedIntensity] += image(currentX, currentY, 2);
                     }
                 }
             }
@@ -321,18 +322,42 @@ void oilPainting(Image &image){
         }
     }
 
-    image = result;
+    copyImage(result, image);
 }
 
-// Oil Painting butotn functionality
+// Oil Painting button functionality
 void MainWindow::on_oilBtn_clicked() {
-    // Apply filter on image
-    oilPainting(image);
-
-    // Update Image
-    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+    // Navigate to configuration
+    ui -> FooterNavigationStackedWidget -> setCurrentIndex(7);
 }
 
+void MainWindow::on_oilPaintingSlider_valueChanged(int value)
+{
+    // Update label
+    ui -> oilPaintingValueLabel -> setText(QString::number(value));
+
+    // Create a temp image for previewing the effect
+    Image tempImage(image.width, image.height);
+    copyImage(image, tempImage);
+
+    // Apply the effect on temp image
+    oilPainting(tempImage, value);
+
+    // Display temp image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(tempImage).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+}
+
+void MainWindow::on_oilPaintingApplyBtn_clicked()
+{
+    // Apply filter
+    oilPainting(image, ui -> oilPaintingSlider -> value());
+
+    // Display image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+
+    // Reset slider value
+    ui -> oilPaintingSlider -> setValue(0);
+}
 
 
 // Infrared Filter
@@ -602,5 +627,7 @@ void MainWindow::on_blurApplyBtn_clicked() {
     // Reset slider value
     ui -> blurSlider -> setValue(1);
 }
+
+
 
 

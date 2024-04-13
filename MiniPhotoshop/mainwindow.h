@@ -62,6 +62,10 @@ private slots:
 
     void on_blurBtn_clicked();
 
+    void on_oilPaintingSlider_valueChanged(int value);
+
+    void on_oilPaintingApplyBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

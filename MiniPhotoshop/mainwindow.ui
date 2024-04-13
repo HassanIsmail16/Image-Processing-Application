@@ -1445,7 +1445,7 @@ border-radius: 15px;</string>
                        <number>1</number>
                       </property>
                       <property name="maximum">
-                       <number>20</number>
+                       <number>10</number>
                       </property>
                       <property name="singleStep">
                        <number>1</number>
