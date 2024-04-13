@@ -815,7 +815,7 @@ void flipImageVertically(Image &image){
 // Rotate Button Functionality
 void MainWindow::on_rotateBtn_clicked() {
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(8);
-    footerWidgetStates.push_back(9);
+    footerWidgetStates.push_back(8);
 }
 
 
@@ -864,4 +864,95 @@ void MainWindow::on_rotate270_clicked() {
 
     ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
 }
+
+
+
+// Skew Filter
+int getTranslationValue(int y, double angle, int height) {
+    int translatedCoordinate = (height - y) * tan((angle * M_PI) / 180);
+    return translatedCoordinate;
+}
+
+void skewImage(Image &image, pair<double, int> skewConfiguration) {
+    // Gets the skew angle
+    double angle = skewConfiguration.first;
+
+    // Gets the skew direction
+    int direction = skewConfiguration.second;
+
+    // Creates a new image to be skewed
+    Image skewedImage(image.width + getTranslationValue(0, angle, image.height), image.height);
+
+    for (int row = 0; row < image.height; row++) {
+        for (int col = 0; col < image.width; col++) {
+            // Gets the current translation distance
+            int y = (direction == 1) ? row : image.height - row;
+
+            int currentTranslation = getTranslationValue(y, angle, image.height);
+            for (int channel = 0; channel < image.channels; channel++) {
+                skewedImage(col + currentTranslation, row, channel) = image(col, row, channel);
+            }
+        }
+    }
+    image = skewedImage;
+}
+
+void MainWindow::on_skewBtn_clicked() {
+    ui -> FooterNavigationStackedWidget -> setCurrentIndex(9);
+    footerWidgetStates.push_back(9);
+}
+
+
+void MainWindow::on_skewAngleSlider_valueChanged(int value) {
+    // Update label
+    ui -> skewAngleValueLabel -> setText(QString::number(value));
+
+    // Create a temp image for previewing the effect
+    Image tempImage(image.width, image.height);
+    copyImage(image, tempImage);
+
+    pair<double, int> skewConfiguration;
+
+    // Gets skew angle value from slider value
+    double skewAngle = ui -> skewAngleSlider -> value();
+
+    // Determines the skew direction
+    int skewDirection = (skewAngle >= 0) ? 1 : -1;
+
+    // Specifies skew configuration
+    skewConfiguration = {abs(skewAngle), skewDirection};
+
+    // Apply the effect on temp image
+    skewImage(tempImage, skewConfiguration);
+
+    // Display temp image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(tempImage).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+}
+
+
+void MainWindow::on_skewApplyBtn_clicked() {
+    pair<double, int> skewConfiguration;
+
+    // Gets skew angle value from slider value
+    double skewAngle = ui -> skewAngleSlider -> value();
+
+    // Determines the skew direction
+    int skewDirection = (skewAngle >= 0) ? 1 : -1;
+
+    // Specifies skew configuration
+    skewConfiguration = {abs(skewAngle), skewDirection};
+
+    // Apply the effect on temp image
+    skewImage(image, skewConfiguration);
+
+    // Display temp image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+
+    // Reset skew angle slider
+    ui -> skewAngleSlider -> setValue(0);
+}
+
+
+
+
 

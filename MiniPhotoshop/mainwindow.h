@@ -82,6 +82,12 @@ private slots:
 
     void on_rotate270_clicked();
 
+    void on_skewBtn_clicked();
+
+    void on_skewAngleSlider_valueChanged(int value);
+
+    void on_skewApplyBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
 
