@@ -13,6 +13,8 @@
 using namespace std;
 
 Image image;
+QString filename;
+deque<int> footerWidgetStates;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -72,33 +74,10 @@ void copyImage(Image &source, Image &destination){
 
 // UI Functionality
 
-
-// Global Back Button Functionality
-deque<int> footerWidgetStates;
-
-// Slot implementation to update background color based on condition
-void MainWindow::updateStyleSheet() {
-    if (footerWidgetStates.size() > 1) {
-        ui->globalBackBtn->setStyleSheet("border-radius: 6px; background-color: #ffffff; color: #000000;");
-        ui->globalBackBtn->setCursor(Qt::PointingHandCursor);
-    } else {
-        ui->globalBackBtn->setStyleSheet("border-radius: 6px; background-color: #787878; color: #000000;");
-        ui->globalBackBtn->setCursor(Qt::ArrowCursor);
-
-    }
-}
-
-void MainWindow::on_globalBackBtn_clicked() {
-    if (footerWidgetStates.size() > 1) {
-        footerWidgetStates.pop_back();
-        ui -> FooterNavigationStackedWidget -> setCurrentIndex(footerWidgetStates.back());
-    }
-}
-
 // Open Image Button Welcome Screen
 void MainWindow::on_openImage_clicked() {
     // Gets image from user
-    QString filename = QFileDialog::getOpenFileName(this, tr("Select an image to be edited"), QDir::homePath(), "Images (*.png *.bmp *.jpg *.jpeg)");
+    filename = QFileDialog::getOpenFileName(this, tr("Select an image to be edited"), QDir::homePath(), "Images (*.png *.bmp *.jpg *.jpeg)");
 
     // Makes sure that the input is valid and loads the image
     if (!filename.isEmpty()) {
@@ -120,6 +99,32 @@ void MainWindow::on_openImage_clicked() {
     }
 }
 
+// Global Back Button Functionality
+
+// Slot implementation to update background color based on condition
+void MainWindow::updateStyleSheet() {
+    if (footerWidgetStates.size() > 1) {
+        ui->globalBackBtn->setStyleSheet("border-radius: 6px; background-color: #ffffff; color: #000000;");
+        ui->globalBackBtn->setCursor(Qt::PointingHandCursor);
+    } else {
+        ui->globalBackBtn->setStyleSheet("border-radius: 6px; background-color: #787878; color: #000000;");
+        ui->globalBackBtn->setCursor(Qt::ForbiddenCursor);
+
+    }
+}
+
+void MainWindow::on_globalBackBtn_clicked() {
+    if (footerWidgetStates.size() > 1) {
+        footerWidgetStates.pop_back();
+        ui -> FooterNavigationStackedWidget -> setCurrentIndex(footerWidgetStates.back());
+    }
+}
+
+// Save image button functionality
+void MainWindow::on_saveImage_clicked() {
+    QString savePath = QFileDialog::getSaveFileName(this, tr("Save Image"), QDir::homePath(), tr("Images (*.png *.jpg *.jpeg *.bmp)"));
+}
+
 // Effects button functionality
 void MainWindow::on_effectsBtn_clicked() {
     // Changes footer to effects navigation
@@ -133,20 +138,6 @@ void MainWindow::on_toolsBtn_clicked() {
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(2);
     footerWidgetStates.push_back(2);
 }
-
-// Tools back button functionality
-void MainWindow::on_backBtn_tools_clicked() {
-    // Goes back to main footer navigation
-    ui -> FooterNavigationStackedWidget -> setCurrentIndex(0);
-}
-
-
-// Effects back button functionality
-void MainWindow::on_backBtn_fx_clicked() {
-    // Goes back to main footer navigation
-    ui -> FooterNavigationStackedWidget -> setCurrentIndex(0);
-}
-
 
 
 // Effects
@@ -651,7 +642,5 @@ void MainWindow::on_blurApplyBtn_clicked() {
     // Reset slider value
     ui -> blurSlider -> setValue(1);
 }
-
-
 
 
