@@ -77,7 +77,7 @@ void copyImage(Image &source, Image &destination){
 // Open Image Button Welcome Screen
 void MainWindow::on_openImage_clicked() {
     // Gets image from user
-    filename = QFileDialog::getOpenFileName(this, tr("Select an image to be edited"), QDir::homePath(), "Images (*.png *.bmp *.jpg *.jpeg)");
+    filename = QFileDialog::getOpenFileName(this, tr("Load Image"), QDir::homePath(), "Images (*.png *.bmp *.jpg *.jpeg)");
 
     // Makes sure that the input is valid and loads the image
     if (!filename.isEmpty()) {
@@ -139,9 +139,26 @@ void MainWindow::on_saveImage_clicked() {
             // Error saving image
             QMessageBox::critical(this, tr("Error"), tr("Failed to save image."));
         }
+    }
+}
+
+// Load image button functionality
+void MainWindow::on_loadImage_clicked() {
+    QMessageBox messageBox;
+    messageBox.setText("Do you want to save before loading a new image?");
+    messageBox.addButton(tr("Save"), QMessageBox::AcceptRole);
+    messageBox.addButton(tr("Don't Save"), QMessageBox::RejectRole);
+    messageBox.addButton(tr("Cancel"), QMessageBox::RejectRole);
+
+    int choice = messageBox.exec();
+
+    if (choice == QMessageBox::AcceptRole) {
+        on_saveImage_clicked();
+        on_openImage_clicked();
+    } else if (choice == QMessageBox::RejectRole) {
+        on_openImage_clicked();
     } else {
-        // Error loading image
-        QMessageBox::critical(this, tr("Error"), tr("Failed to load image."));
+        return;
     }
 }
 
@@ -662,5 +679,6 @@ void MainWindow::on_blurApplyBtn_clicked() {
     // Reset slider value
     ui -> blurSlider -> setValue(1);
 }
+
 
 
