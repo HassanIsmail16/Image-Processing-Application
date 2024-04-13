@@ -677,6 +677,77 @@ void MainWindow::on_blurApplyBtn_clicked() {
     ui -> blurSlider -> setValue(1);
 }
 
+// Purple Filter
+void purpleFilter(Image &image){
+    // Iterate over each pixel
+    unsigned int light = 0;
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            // Reduce green value in the pixel to get purple filter
+            image(i,j,1) *= 0.7;
+            for (int k = 0; k < 3; ++k) {
+                // Increase light in image
+                light = image(i,j,k);
+                light /= 6;
+                if(image(i,j,k) + light < 255)
+                    image(i,j,k) += light;
+                else
+                    image(i,j,k) = 255;
+            }
+        }
+    }
+}
+
+// Overlay(purple) button functionality
+
+void MainWindow::on_overlaysBtn_clicked()
+{
+    // Apply filter on image
+    purpleFilter(image);
+
+    // Display new image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+
+}
+
+// Old TV Filter
+
+void oldTVFilter(Image &image){
+
+    // Create a random number generator
+    random_device rd;
+    mt19937 generator(rd());
+
+    // Create uniform distribution
+    uniform_real_distribution<> distribution(-30, 30);
+
+    for (int row = 0; row < image.width; ++row) {
+        for (int col = 0; col < image.height; ++col) {
+            // Generate random noise for each channel
+            double noiseR = distribution(generator);
+            double noiseG = distribution(generator);
+            double noiseB = distribution(generator);
+
+            // Add noise to all channels
+            image(row, col, 0) = min(image(row, col, 0) + noiseR, 255.0);
+            image(row, col, 1) = min(image(row, col, 1) + noiseG, 255.0);
+            image(row, col, 2) = min(image(row, col, 2) + noiseB, 255.0);
+        }
+    }
+    darkFilter(image, 5);
+}
+
+// TV button functionality
+
+void MainWindow::on_tvBtn_clicked()
+{
+    // Apply filter on image
+    oldTVFilter(image);
+
+    // Display new image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+
+}
 
 
 

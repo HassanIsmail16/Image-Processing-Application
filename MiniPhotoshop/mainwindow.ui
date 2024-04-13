@@ -301,7 +301,7 @@ border-radius: 25px;</string>
               </size>
              </property>
              <property name="currentIndex">
-              <number>0</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="footer0">
               <layout class="QGridLayout" name="gridLayout_7">
@@ -1548,7 +1548,7 @@ font: 8pt &quot;Poppins&quot;;</string>
      <x>0</x>
      <y>0</y>
      <width>868</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
