@@ -66,6 +66,14 @@ private slots:
 
     void on_loadImage_clicked();
 
+    void on_rotateBtn_clicked();
+
+    void on_rotate90_clicked();
+
+    void on_rotate180_clicked();
+
+    void on_rotate270_clicked();
+
 private:
     Ui::MainWindow *ui;
 
