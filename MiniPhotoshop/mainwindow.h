@@ -58,9 +58,15 @@ private slots:
 
     void on_blurBtn_clicked();
 
+<<<<<<< HEAD
+    void on_oilPaintingSlider_valueChanged(int value);
+
+    void on_oilPaintingApplyBtn_clicked();
+=======
     void on_globalBackBtn_clicked();
 
     void updateStyleSheet();
+>>>>>>> 551b0841b8b7d71d5231086e13e18ff8ec56334c
 
 private:
     Ui::MainWindow *ui;
