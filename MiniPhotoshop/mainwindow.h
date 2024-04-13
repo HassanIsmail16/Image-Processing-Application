@@ -64,6 +64,8 @@ private slots:
 
     void on_oilPaintingSlider_valueChanged(int value);
 
+    void on_tvBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
 };
