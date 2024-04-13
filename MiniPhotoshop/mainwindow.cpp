@@ -138,6 +138,8 @@ void GSfilter(Image &image){
 void MainWindow::on_grayScaleBtn_clicked() {
     // Apply filter on image
     GSfilter(image);
+
+    // Display new image
     ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
 }
 
@@ -601,4 +603,9 @@ void MainWindow::on_blurApplyBtn_clicked() {
     ui -> blurSlider -> setValue(1);
 }
 
+
+void MainWindow::on_tvBtn_clicked()
+{
+
+}
 
