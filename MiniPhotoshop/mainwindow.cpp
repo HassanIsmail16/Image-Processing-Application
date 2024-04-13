@@ -123,6 +123,26 @@ void MainWindow::on_globalBackBtn_clicked() {
 // Save image button functionality
 void MainWindow::on_saveImage_clicked() {
     QString savePath = QFileDialog::getSaveFileName(this, tr("Save Image"), QDir::homePath(), tr("Images (*.png *.jpg *.jpeg *.bmp)"));
+
+    // Check if the user selected a file
+    if (!savePath.isEmpty()) {
+        // User selected a file, perform save operation
+        QPixmap pixmap(filename); // Example pixmap, replace with your own image
+        // Convert QPixmap to QImage
+        QImage image = pixmap.toImage();
+
+        // Save the QImage to the selected file
+        if (image.save(savePath)) {
+            // Image saved successfully
+            QMessageBox::information(this, tr("Success"), tr("Image saved successfully."));
+        } else {
+            // Error saving image
+            QMessageBox::critical(this, tr("Error"), tr("Failed to save image."));
+        }
+    } else {
+        // Error loading image
+        QMessageBox::critical(this, tr("Error"), tr("Failed to load image."));
+    }
 }
 
 // Effects button functionality
