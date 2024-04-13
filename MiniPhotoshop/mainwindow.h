@@ -62,6 +62,10 @@ private slots:
 
     void on_blurBtn_clicked();
 
+    void on_overlaysBtn_clicked();
+
+    void on_tvBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
 };
