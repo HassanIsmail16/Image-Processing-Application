@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QImage>
+#include <QTimer>
 
 #define el "\n"
 #define space " "
@@ -17,6 +18,19 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow) {
     ui->setupUi(this);
+
+    // Create a QTimer
+    timer = new QTimer(this);
+
+    // Connect the timeout() signal to the slot that updates the stylesheet
+    connect(timer, &QTimer::timeout, this, &MainWindow::updateStyleSheet);
+
+    // Set the interval for the timer (in milliseconds)
+    int interval = 300; // 1000 milliseconds = 1 second
+    timer->setInterval(interval);
+
+    // Start the timer
+    timer->start();
 }
 
 MainWindow::~MainWindow() {
@@ -58,6 +72,29 @@ void copyImage(Image &source, Image &destination){
 
 // UI Functionality
 
+
+// Global Back Button Functionality
+deque<int> footerWidgetStates;
+
+// Slot implementation to update background color based on condition
+void MainWindow::updateStyleSheet() {
+    if (footerWidgetStates.size() > 1) {
+        ui->globalBackBtn->setStyleSheet("border-radius: 6px; background-color: #ffffff; color: #000000;");
+        ui->globalBackBtn->setCursor(Qt::PointingHandCursor);
+    } else {
+        ui->globalBackBtn->setStyleSheet("border-radius: 6px; background-color: #787878; color: #000000;");
+        ui->globalBackBtn->setCursor(Qt::ArrowCursor);
+
+    }
+}
+
+void MainWindow::on_globalBackBtn_clicked() {
+    if (footerWidgetStates.size() > 1) {
+        footerWidgetStates.pop_back();
+        ui -> FooterNavigationStackedWidget -> setCurrentIndex(footerWidgetStates.back());
+    }
+}
+
 // Open Image Button Welcome Screen
 void MainWindow::on_openImage_clicked() {
     // Gets image from user
@@ -79,6 +116,7 @@ void MainWindow::on_openImage_clicked() {
 
         // Switch to main page
         ui -> stackedWidget -> setCurrentIndex(1);
+        footerWidgetStates.push_back(0);
     }
 }
 
@@ -86,19 +124,20 @@ void MainWindow::on_openImage_clicked() {
 void MainWindow::on_effectsBtn_clicked() {
     // Changes footer to effects navigation
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(1);
+    footerWidgetStates.push_back(1);
 }
 
 // Tools button functionality
 void MainWindow::on_toolsBtn_clicked() {
     // Changes footer to tools navigation
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(2);
+    footerWidgetStates.push_back(2);
 }
 
 // Tools back button functionality
 void MainWindow::on_backBtn_tools_clicked() {
     // Goes back to main footer navigation
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(0);
-
 }
 
 
@@ -106,7 +145,6 @@ void MainWindow::on_backBtn_tools_clicked() {
 void MainWindow::on_backBtn_fx_clicked() {
     // Goes back to main footer navigation
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(0);
-
 }
 
 
@@ -267,9 +305,9 @@ void MainWindow::on_warmBtn_clicked() {
 // Oil Painting Filter
 
 // Oil Painting Filter Algorithm
-void oilPainting(Image &image){
+void oilPainting(Image &image, int radius){
     Image result(image.width, image.height);
-    int radius = 5, intensityLevels = 20;
+    int intensityLevels = 20;
 
     for (int row = 0; row < image.width; ++row) {
         for (int col = 0; col < image.height; ++col) {
@@ -277,8 +315,8 @@ void oilPainting(Image &image){
 
             // Track the RGB values for each intensity level and the count of each intensity level.
             int sumR[21] = {0}, sumG[21] = {0}, sumB[21] = {0}, levelCount[21] = {0};
-            int cappedIntensity = 0;
-            double realIntensity = 0;
+            double realIntensity = 0, cappedIntensity;
+            int intCappedIntensity;
             for (int i = - radius; i <= radius; ++i) {
                 for (int j = - radius; j <= radius; ++j) {
 
@@ -291,16 +329,17 @@ void oilPainting(Image &image){
                         // Real intensity is the average of the RGB Channels
                         realIntensity = (double) (image(currentX, currentY, 0) + image(currentX, currentY, 1) + image(currentX, currentY, 2)) / 3;
                         // Divide the intensity to a certain amount of levels so that the intensity level falls between 1 and number of intensity level.
-                        cappedIntensity = (realIntensity * intensityLevels) / 255;
+                        cappedIntensity = ceil((realIntensity * intensityLevels) / 255);
+                        intCappedIntensity = int(cappedIntensity);
 
                         /* Count the frequency of each intensity level
                          * Calculate the sum of RGB values to be able to calculate the average later.
                          * All data for an intensity level is stored at index = intensity level.
                          */
-                        levelCount[cappedIntensity]++;
-                        sumR[cappedIntensity] += image(currentX, currentY, 0);
-                        sumG[cappedIntensity] += image(currentX, currentY, 1);
-                        sumB[cappedIntensity] += image(currentX, currentY, 2);
+                        levelCount[intCappedIntensity]++;
+                        sumR[intCappedIntensity] += image(currentX, currentY, 0);
+                        sumG[intCappedIntensity] += image(currentX, currentY, 1);
+                        sumB[intCappedIntensity] += image(currentX, currentY, 2);
                     }
                 }
             }
@@ -321,18 +360,42 @@ void oilPainting(Image &image){
         }
     }
 
-    image = result;
+    copyImage(result, image);
 }
 
-// Oil Painting butotn functionality
+// Oil Painting button functionality
 void MainWindow::on_oilBtn_clicked() {
-    // Apply filter on image
-    oilPainting(image);
-
-    // Update Image
-    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+    // Navigate to configuration
+    ui -> FooterNavigationStackedWidget -> setCurrentIndex(7);
 }
 
+void MainWindow::on_oilPaintingSlider_valueChanged(int value)
+{
+    // Update label
+    ui -> oilPaintingValueLabel -> setText(QString::number(value));
+
+    // Create a temp image for previewing the effect
+    Image tempImage(image.width, image.height);
+    copyImage(image, tempImage);
+
+    // Apply the effect on temp image
+    oilPainting(tempImage, value);
+
+    // Display temp image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(tempImage).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+}
+
+void MainWindow::on_oilPaintingApplyBtn_clicked()
+{
+    // Apply filter
+    oilPainting(image, ui -> oilPaintingSlider -> value());
+
+    // Display image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+
+    // Reset slider value
+    ui -> oilPaintingSlider -> setValue(0);
+}
 
 
 // Infrared Filter
@@ -382,6 +445,7 @@ void MainWindow::on_infraredBtn_clicked() {
 void MainWindow::on_darkenAndLightenBtn_clicked() {
     // Change to Darken and Lighten Filter Navigation
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(3);
+    footerWidgetStates.push_back(3);
 }
 
 // Darken Algorithm
@@ -421,12 +485,14 @@ void lightFilter(Image &image, float percentage){
 void MainWindow::on_darkenBtn_clicked() {
     // Change to darken configuration footer
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(4);
+    footerWidgetStates.push_back(4);
 }
 
 // Lighten Button Functionality
 void MainWindow::on_lightenBtn_clicked() {
     // Change to lighten configuration footer
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(5);
+    footerWidgetStates.push_back(5);
 }
 
 // Darken value slider functionality
@@ -494,6 +560,7 @@ void MainWindow::on_lightenApplyBtn_clicked() {
 void MainWindow::on_blurBtn_clicked() {
     // Change Footer Navigation to Blur Configuration
     ui -> FooterNavigationStackedWidget -> setCurrentIndex(6);
+    footerWidgetStates.push_back(6);
 }
 
 // Blur Filter Algorithm Functions
@@ -681,4 +748,6 @@ void MainWindow::on_tvBtn_clicked()
     ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
 
 }
+
+
 

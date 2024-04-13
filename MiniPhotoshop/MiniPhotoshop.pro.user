@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
+<<<<<<< HEAD
 <!-- Written by QtCreator 13.0.0, 2024-04-13T23:38:32. -->
+=======
+<!-- Written by QtCreator 13.0.0, 2024-04-13T21:26:29. -->
+>>>>>>> 30b7232e19d61a0d7e6d8dab45d9714f80d43cb6
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -135,6 +139,7 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4BuildConfiguration</value>
     <value type="int" key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration">2</value>
    </valuemap>
+<<<<<<< HEAD
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.1">
     <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">C:\Users\hassa\CLionProjects\A3\CS112_AS3\MiniPhotoshop\build\Desktop_Qt_6_7_0_MinGW_64_bit-Release</value>
     <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">C:/Users/hassa/CLionProjects/A3/CS112_AS3/MiniPhotoshop/build/Desktop_Qt_6_7_0_MinGW_64_bit-Release</value>
@@ -218,6 +223,9 @@
     <value type="int" key="SeparateDebugInfo">0</value>
    </valuemap>
    <value type="qlonglong" key="ProjectExplorer.Target.BuildConfigurationCount">3</value>
+=======
+   <value type="qlonglong" key="ProjectExplorer.Target.BuildConfigurationCount">1</value>
+>>>>>>> 30b7232e19d61a0d7e6d8dab45d9714f80d43cb6
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.DeployConfiguration.0">
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <value type="qlonglong" key="ProjectExplorer.BuildStepList.StepsCount">0</value>

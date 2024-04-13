@@ -26,10 +26,6 @@ private slots:
 
     void on_toolsBtn_clicked();
 
-    void on_backBtn_fx_clicked();
-
-    void on_backBtn_tools_clicked();
-
     void on_blackAndWhiteBtn_clicked();
 
     void on_invertBtn_clicked();
@@ -62,11 +58,25 @@ private slots:
 
     void on_blurBtn_clicked();
 
+<<<<<<< HEAD
     void on_overlaysBtn_clicked();
 
     void on_tvBtn_clicked();
+=======
+<<<<<<< HEAD
+    void on_oilPaintingSlider_valueChanged(int value);
+
+    void on_oilPaintingApplyBtn_clicked();
+=======
+    void on_globalBackBtn_clicked();
+
+    void updateStyleSheet();
+>>>>>>> 551b0841b8b7d71d5231086e13e18ff8ec56334c
+>>>>>>> 30b7232e19d61a0d7e6d8dab45d9714f80d43cb6
 
 private:
     Ui::MainWindow *ui;
+
+    QTimer *timer;
 };
 #endif // MAINWINDOW_H
