@@ -522,7 +522,7 @@ double getConvolutedCell(int value, int kernelX, int kernelY, const vector<vecto
     return result;
 }
 
-Image kernelConvolution(Image &image, double kernelSize, const vector<vector<double>>& gaussianKernel) {
+void kernelConvolution(Image &image, double kernelSize, const vector<vector<double>>& gaussianKernel) {
     // Creates a copy of the image to be blurred
     Image blurredImage(image.width, image.height);
     copyImage(image, blurredImage);
@@ -555,13 +555,20 @@ Image kernelConvolution(Image &image, double kernelSize, const vector<vector<dou
                 }
             }
 
-            // Adjusts the new pixel values
-            blurredImage.setPixel(col, row, 0, currentPixelR / kernelWeightSum);
-            blurredImage.setPixel(col, row, 1, currentPixelG / kernelWeightSum);
-            blurredImage.setPixel(col, row, 2, currentPixelB / kernelWeightSum);
+            // Adjusts the new pixel values only if kernelWeightSum is not zero
+            if (kernelWeightSum != 0) {
+                blurredImage.setPixel(col, row, 0, currentPixelR / kernelWeightSum);
+                blurredImage.setPixel(col, row, 1, currentPixelG / kernelWeightSum);
+                blurredImage.setPixel(col, row, 2, currentPixelB / kernelWeightSum);
+            } else {
+                // If kernelWeightSum is zero, retain the original pixel values
+                blurredImage.setPixel(col, row, 0, image(col, row, 0));
+                blurredImage.setPixel(col, row, 1, image(col, row, 1));
+                blurredImage.setPixel(col, row, 2, image(col, row, 2));
+            }
         }
     }
-    return blurredImage;
+    copyImage(blurredImage, image);
 }
 
 void gaussianBlur(Image &image, double kernelSize) {
@@ -572,7 +579,7 @@ void gaussianBlur(Image &image, double kernelSize) {
     vector<vector<double>> gaussianKernel = constructGaussianKernel(kernelSize, standardDeviation);
 
     // Does the kernel convolution process to the image to blur it
-    image = kernelConvolution(image, kernelSize, gaussianKernel);
+    kernelConvolution(image, kernelSize, gaussianKernel);
 }
 
 // Blur Slider Functionality
@@ -603,9 +610,4 @@ void MainWindow::on_blurApplyBtn_clicked() {
     ui -> blurSlider -> setValue(1);
 }
 
-
-void MainWindow::on_tvBtn_clicked()
-{
-
-}
 
