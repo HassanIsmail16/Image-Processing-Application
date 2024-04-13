@@ -26,10 +26,6 @@ private slots:
 
     void on_toolsBtn_clicked();
 
-    void on_backBtn_fx_clicked();
-
-    void on_backBtn_tools_clicked();
-
     void on_blackAndWhiteBtn_clicked();
 
     void on_invertBtn_clicked();
@@ -62,7 +58,13 @@ private slots:
 
     void on_blurBtn_clicked();
 
+    void on_globalBackBtn_clicked();
+
+    void updateStyleSheet();
+
 private:
     Ui::MainWindow *ui;
+
+    QTimer *timer;
 };
 #endif // MAINWINDOW_H
