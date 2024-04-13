@@ -604,8 +604,3 @@ void MainWindow::on_blurApplyBtn_clicked() {
 }
 
 
-void MainWindow::on_tvBtn_clicked()
-{
-
-}
-
