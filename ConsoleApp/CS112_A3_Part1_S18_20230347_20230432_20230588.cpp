@@ -221,14 +221,17 @@ void filterSelection() {
         switch (choice) {
             case 1: {
                 GSfilter(image);
+                cout << "Applied Grayscale Filter." << el;
                 break;
             }
             case 2: {
                 blackAndWhiteFilter(image);
+                cout << "Applied Black and White Filter." << el;
                 break;
             }
             case 3: {
                 invertImage(image);
+                cout << "Applied Image Inversion Filter." << el;
                 break;
             }
             case 4: {
@@ -241,6 +244,7 @@ void filterSelection() {
                 else {
                     mergeConfiguration(image, image2);
                 }
+                cout << "Merged Images." << el;
                 break;
             }
             case 5: {
@@ -254,9 +258,11 @@ void filterSelection() {
                 switch (flipChoice) {
                     case 1:
                         flipImageHorizontally(image);
+                        cout << "Flipped Image Horizontally." << el;
                         break;
                     case 2:
                         flipImageVertically(image);
+                        cout << "Flipped Image Vertically." << el;
                         break;
                     default:
                         cout << "Invalid Choice. Please select 1 or 2..." << el;
@@ -277,12 +283,15 @@ void filterSelection() {
                 switch (rotationChoice) {
                     case 1:
                         rotate90(image);
+                        cout << "Rotated Image by 90 degrees." << el;
                         break;
                     case 2:
                         rotate180(image);
+                        cout << "Rotated Image by 180 degrees." << el;
                         break;
                     case 3:
                         rotate270(image);
+                        cout << "Rotated Image by 270 degrees." << el;
                         break;
                     default:
                         cout << "Invalid input. Please select an integer between 1 and 3..." << el;
@@ -301,14 +310,15 @@ void filterSelection() {
                 }
                 else if (percentage > 0){
                     lightFilter(image, percentage);
+                    cout << "Lightened Image by " << percentage << "%." << el;
                     break;
                 }
                 else{
                     percentage = abs(percentage);
                     darkFilter(image, percentage);
+                    cout << "Darkened Image by " << abs(percentage) << "%." << el;
                     break;
                 }
-                break;
             }
             case 8: {
                 // Input coordinates
@@ -329,16 +339,19 @@ void filterSelection() {
                     cout << "-------------------------------------" << el;
                 } else{
                     cropImage(image, dimensions, coordinates);
+                    cout << "Cropped Image." << el;
                 }
                 break;
             }
             case 9: {
                 frameFilter(image, frameConfiguration(image));
+                cout << "Added a Frame to the Image." << el;
                 break;
             }
             case 10: {
                 blackAndWhiteFilter(image);
                 edgeFilter(image);
+                cout << "Applied the edge detection" << el;
                 break;
             }
             case 11: {
@@ -347,46 +360,56 @@ void filterSelection() {
                 int newWidth = dimensions.first;
                 int newHeight = dimensions.second;
                 resizeImage(image, newWidth, newHeight);
+                cout << "Resized the Image." << el;
                 break;
             }
             case 12: {
                 gaussianBlur(image);
+                cout << "Applied Blur." << el;
                 break;
             }
             case 13: {
                 sunlightFilter(image);
+                cout << "Applied Sunlight Filter." << el;
                 break;
             }
             case 14: {
                 int radius = getRadius();
                 oilPainting(image, radius);
+                cout << "Applied Oil Painting Filter." << el;
                 break;
             }
             case 15: {
                 oldTVFilter(image);
+                cout << "Applied Old TV Filter." << el;
                 break;
             }
             case 16: {
                 purpleFilter(image);
+                cout << "Applied Purple Filter." << el;
                 break;
             }
             case 17: {
                 infraredFilter(image);
+                cout << "Applied Infrared Filter." << el;
                 break;
             }
             case 18: {
                 skewImage(image);
+                cout << "Applied Skew Filter." << el;
                 break;
             }
             case 19: {
                 cout << "Please enter the change percentage (+ve to increase saturation or -ve to decrease saturation):" << el;
                 double changePercentage = getPercentage();
                 changeSaturation(image, changePercentage);
+                cout << "Applied Saturation Adjustment Filter." << el;
                 break;
             }
             case 20: {
                 int contrast = contrastConfiguration();
                 changeContrast(image, contrast);
+                cout << "Applied Contrast Adjustment Filter." << el;
                 break;
             }
             case 21: {
@@ -397,6 +420,7 @@ void filterSelection() {
             case 22: {
                 if (returnMenu() == 1) {
                     saveImage(image);
+                    cout << "Saved Image." << el;
                 } else {
                     cout << "Returning to previous menu... " << el;
                 }
@@ -1155,6 +1179,7 @@ void gaussianBlur(Image &image) {
     vector<vector<double>> gaussianKernel = constructGaussianKernel(kernelSize, standardDeviation);
 
     // Does the kernel convolution process to the image to blur it
+    cout << "Applying Blur Filter..." << el;
     image = kernelConvolution(image, kernelSize, gaussianKernel);
 }
 
@@ -1255,6 +1280,7 @@ void oilPainting(Image &image, int radius){
     Image result(image.width, image.height);
     int intensityLevels = 20;
 
+    cout << "Applying Oil Painting Filter..." << el;
     for (int row = 0; row < image.width; ++row) {
         for (int col = 0; col < image.height; ++col) {
             // Analyze the intensity of all pixels within the radius
