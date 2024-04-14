@@ -40,7 +40,7 @@ void invertImage(Image &image);
 
 // Image Merging
 void mergeFilter(Image &image, Image &image2);
-void mergeFilter2(Image &image, Image &image2, Image &result);
+void mergeFilter2(Image &image, Image &image2, Image &result); // Another Version for merging the common area between the 2 images.
 void mergeConfiguration(Image &image, Image &image2);
 
 // Flip Image
@@ -1253,6 +1253,8 @@ int getRadius(){
 }
 void oilPainting(Image &image, int radius){
     Image result(image.width, image.height);
+
+    // 20 color levels is adequate create oil painting effect.
     int intensityLevels = 20;
 
     for (int row = 0; row < image.width; ++row) {
@@ -1332,6 +1334,8 @@ void oldTVFilter(Image &image){
             image(row, col, 2) = min(image(row, col, 2) + noiseB, 255.0);
         }
     }
+
+    // Reduce brightness slightly
     darkFilter(image, 5);
 }
 
