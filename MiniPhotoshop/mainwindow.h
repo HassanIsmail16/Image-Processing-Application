@@ -88,6 +88,24 @@ private slots:
 
     void on_skewApplyBtn_clicked();
 
+    void on_saturationApplyBtn_clicked();
+
+    void on_saturationBtn_clicked();
+
+    void on_saturationSlider_valueChanged(int value);
+
+    void on_contrastBtn_clicked();
+
+    void on_contrastSlider_valueChanged(int value);
+
+    void on_contrastApplyBtn_clicked();
+
+    void on_flipHorizontallyBtn_clicked();
+
+    void on_flipVerticallyBtn_clicked();
+
+    void on_flipBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
 
