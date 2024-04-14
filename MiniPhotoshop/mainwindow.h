@@ -59,6 +59,14 @@ private slots:
 
     void on_blurBtn_clicked();
 
+    void on_overlaysBtn_clicked();
+
+    void on_tvBtn_clicked();
+
+    void on_oilPaintingSlider_valueChanged(int value);
+
+    void on_oilPaintingApplyBtn_clicked();
+
     void on_globalBackBtn_clicked();
 
     void updateStyleSheet();
@@ -96,6 +104,24 @@ private slots:
     void on_frameSizeSlider_valueChanged(int value);
 
     void on_frameSizeApplyBtn_clicked();
+
+    void on_saturationApplyBtn_clicked();
+
+    void on_saturationBtn_clicked();
+
+    void on_saturationSlider_valueChanged(int value);
+
+    void on_contrastBtn_clicked();
+
+    void on_contrastSlider_valueChanged(int value);
+
+    void on_contrastApplyBtn_clicked();
+
+    void on_flipHorizontallyBtn_clicked();
+
+    void on_flipVerticallyBtn_clicked();
+
+    void on_flipBtn_clicked();
 
 private:
     Ui::MainWindow *ui;

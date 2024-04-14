@@ -336,9 +336,9 @@ void MainWindow::on_warmBtn_clicked() {
 // Oil Painting Filter
 
 // Oil Painting Filter Algorithm
-void oilPainting(Image &image){
+void oilPainting(Image &image, int radius){
     Image result(image.width, image.height);
-    int radius = 5, intensityLevels = 20;
+    int intensityLevels = 20;
 
     for (int row = 0; row < image.width; ++row) {
         for (int col = 0; col < image.height; ++col) {
@@ -346,8 +346,8 @@ void oilPainting(Image &image){
 
             // Track the RGB values for each intensity level and the count of each intensity level.
             int sumR[21] = {0}, sumG[21] = {0}, sumB[21] = {0}, levelCount[21] = {0};
-            int cappedIntensity = 0;
-            double realIntensity = 0;
+            double realIntensity = 0, cappedIntensity;
+            int intCappedIntensity;
             for (int i = - radius; i <= radius; ++i) {
                 for (int j = - radius; j <= radius; ++j) {
 
@@ -360,16 +360,17 @@ void oilPainting(Image &image){
                         // Real intensity is the average of the RGB Channels
                         realIntensity = (double) (image(currentX, currentY, 0) + image(currentX, currentY, 1) + image(currentX, currentY, 2)) / 3;
                         // Divide the intensity to a certain amount of levels so that the intensity level falls between 1 and number of intensity level.
-                        cappedIntensity = (realIntensity * intensityLevels) / 255;
+                        cappedIntensity = ceil((realIntensity * intensityLevels) / 255);
+                        intCappedIntensity = int(cappedIntensity);
 
                         /* Count the frequency of each intensity level
                          * Calculate the sum of RGB values to be able to calculate the average later.
                          * All data for an intensity level is stored at index = intensity level.
                          */
-                        levelCount[cappedIntensity]++;
-                        sumR[cappedIntensity] += image(currentX, currentY, 0);
-                        sumG[cappedIntensity] += image(currentX, currentY, 1);
-                        sumB[cappedIntensity] += image(currentX, currentY, 2);
+                        levelCount[intCappedIntensity]++;
+                        sumR[intCappedIntensity] += image(currentX, currentY, 0);
+                        sumG[intCappedIntensity] += image(currentX, currentY, 1);
+                        sumB[intCappedIntensity] += image(currentX, currentY, 2);
                     }
                 }
             }
@@ -390,18 +391,42 @@ void oilPainting(Image &image){
         }
     }
 
-    image = result;
+    copyImage(result, image);
 }
 
-// Oil Painting butotn functionality
+// Oil Painting button functionality
 void MainWindow::on_oilBtn_clicked() {
-    // Apply filter on image
-    oilPainting(image);
-
-    // Update Image
-    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+    // Navigate to configuration
+    ui -> FooterNavigationStackedWidget -> setCurrentIndex(7);
 }
 
+void MainWindow::on_oilPaintingSlider_valueChanged(int value)
+{
+    // Update label
+    ui -> oilPaintingValueLabel -> setText(QString::number(value));
+
+    // Create a temp image for previewing the effect
+    Image tempImage(image.width, image.height);
+    copyImage(image, tempImage);
+
+    // Apply the effect on temp image
+    oilPainting(tempImage, value);
+
+    // Display temp image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(tempImage).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+}
+
+void MainWindow::on_oilPaintingApplyBtn_clicked()
+{
+    // Apply filter
+    oilPainting(image, ui -> oilPaintingSlider -> value());
+
+    // Display image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+
+    // Reset slider value
+    ui -> oilPaintingSlider -> setValue(0);
+}
 
 
 // Infrared Filter
@@ -683,6 +708,77 @@ void MainWindow::on_blurApplyBtn_clicked() {
     ui -> blurSlider -> setValue(1);
 }
 
+// Purple Filter
+void purpleFilter(Image &image){
+    // Iterate over each pixel
+    unsigned int light = 0;
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            // Reduce green value in the pixel to get purple filter
+            image(i,j,1) *= 0.7;
+            for (int k = 0; k < 3; ++k) {
+                // Increase light in image
+                light = image(i,j,k);
+                light /= 6;
+                if(image(i,j,k) + light < 255)
+                    image(i,j,k) += light;
+                else
+                    image(i,j,k) = 255;
+            }
+        }
+    }
+}
+
+// Overlay(purple) button functionality
+
+void MainWindow::on_overlaysBtn_clicked()
+{
+    // Apply filter on image
+    purpleFilter(image);
+
+    // Display new image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+
+}
+
+// Old TV Filter
+
+void oldTVFilter(Image &image){
+
+    // Create a random number generator
+    random_device rd;
+    mt19937 generator(rd());
+
+    // Create uniform distribution
+    uniform_real_distribution<> distribution(-30, 30);
+
+    for (int row = 0; row < image.width; ++row) {
+        for (int col = 0; col < image.height; ++col) {
+            // Generate random noise for each channel
+            double noiseR = distribution(generator);
+            double noiseG = distribution(generator);
+            double noiseB = distribution(generator);
+
+            // Add noise to all channels
+            image(row, col, 0) = min(image(row, col, 0) + noiseR, 255.0);
+            image(row, col, 1) = min(image(row, col, 1) + noiseG, 255.0);
+            image(row, col, 2) = min(image(row, col, 2) + noiseB, 255.0);
+        }
+    }
+    darkFilter(image, 5);
+}
+
+// TV button functionality
+
+void MainWindow::on_tvBtn_clicked()
+{
+    // Apply filter on image
+    oldTVFilter(image);
+
+    // Display new image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+
+}
 
 
 // Flip Image
@@ -717,6 +813,35 @@ void flipImageVertically(Image &image){
         }
     }
 }
+
+// Flip Buttons Functionality
+void MainWindow::on_flipBtn_clicked()
+{
+    // Navigate to flip page
+    ui->FooterNavigationStackedWidget -> setCurrentIndex(12);
+    footerWidgetStates.push_back(12);
+}
+
+
+void MainWindow::on_flipVerticallyBtn_clicked()
+{
+    // Apply filter on image
+    flipImageVertically(image);
+
+    // Display new image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+}
+
+void MainWindow::on_flipHorizontallyBtn_clicked()
+{
+    // Apply filter on image
+    flipImageHorizontally(image);
+
+    // Display new image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+}
+
+
 
 
 // Rotate Button Functionality
@@ -860,6 +985,122 @@ void MainWindow::on_skewApplyBtn_clicked() {
 }
 
 
+// Change Saturation
+struct RGB{
+    double r, g, b;
+};
+struct HSL{
+    double h, s, l;
+};
+
+HSL rgbToHsl(RGB rgbColor){
+    // Initialize HSL color structure to store the result.
+    HSL hslColor;
+
+    // Divide RGB values by 255 to change the range from [0, 255] to [0, 1]
+    double R = rgbColor.r / 255, G = rgbColor.g / 255, B = rgbColor.b / 255;
+
+    // Calculate the max and min colors
+    double maxC = max(R, max(G, B));
+    double minC = min(R, min(G, B));
+    double delta = maxC - minC;
+
+    // Calculate the Hue
+    if (delta == 0){
+        hslColor.h = 0;
+    }
+    else if (maxC == R){
+        hslColor.h = 60 * (fmod((G - B) / delta, 6));
+    }
+    else if (maxC == G){
+        hslColor.h = 60 * (((B - R) / delta) + 2);
+    }
+    else {
+        hslColor.h = 60 * (((R - G) / delta) + 4);
+    }
+    // Make sure that the hue is positive
+    if (hslColor.h < 0) hslColor.h += 360;
+
+    // Calculate Lightness
+    hslColor.l = (maxC + minC) / 2;
+
+    // Calculate the saturation
+    if (delta == 0){
+        hslColor.s = 0;
+    }
+    else {
+        hslColor.s = delta / (1 - fabs(2 * hslColor.l - 1));
+    }
+
+    return hslColor;
+}
+
+RGB hslToRgb(HSL hslColor){
+    // Initialize RGB color structure to store the result.
+    RGB rgbColor;
+
+    // Variables used to convert HSL to RGB
+    double C, X, m;
+    C = (1 - fabs(2 * hslColor.l - 1)) * hslColor.s;
+    X = C * (1 - fabs(fmod(hslColor.h / 60, 2) - 1));
+    m = hslColor.l - C / 2;
+
+    // Convert HSL to RGB depending on the value of Hue
+    if (hslColor.h < 60){
+        rgbColor = {C + m, X + m, m};
+    }
+    else if (hslColor.h < 120){
+        rgbColor = {X + m, C + m, m};
+    }
+    else if (hslColor.h < 180){
+        rgbColor = {m, C + m, X +m};
+    }
+    else if (hslColor.h < 240){
+        rgbColor = {m, X + m, C + m};
+    }
+    else if (hslColor.h < 300){
+        rgbColor = {X + m, m, C + m};
+    }
+    else {
+        rgbColor = {C + m, m, X + m};
+    }
+
+    // Convert from [0, 1] range to [0, 255]
+    rgbColor.r *= 255;
+    rgbColor.g *= 255;
+    rgbColor.b *= 255;
+
+    return rgbColor;
+}
+
+void changeSaturation(Image &image, double changePercentage){
+
+    // Calculate saturation change factor
+    double changeFactor = (double) (100 + changePercentage) / 100;
+
+    for (int row = 0; row < image.width; ++row) {
+        for (int col = 0; col < image.height; ++col) {
+            double r = image(row, col, 0), g = image(row, col, 1), b = image(row, col, 2);
+            // Convert RGB color space to HSL color space
+            RGB rgbColor = {r, g, b};
+            HSL hslColor = rgbToHsl(rgbColor);
+
+            // Increase/decrease saturation in HSL color space
+            hslColor.s *= changeFactor;
+
+            // Ensure that the value of the new saturation is between [0, 1]
+            hslColor.s = max(min(hslColor.s, 1.0), 0.0);
+
+            // Convert HSL color space back to RGB
+            rgbColor = hslToRgb(hslColor);
+
+            // Change the saturation of the image
+            image(row, col, 0) = rgbColor.r;
+            image(row, col, 1) = rgbColor.g;
+            image(row, col, 2) = rgbColor.b;
+        }
+    }
+}
 
 
 // Frame Filter
@@ -920,6 +1161,96 @@ void MainWindow::on_frameSizeApplyBtn_clicked() {
     // framefilter(image)
     ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
     ui -> frameSizeSlider -> setValue(0);
+}
+
+
+void MainWindow::on_saturationBtn_clicked()
+{
+    // Navigate to configuration
+    ui -> FooterNavigationStackedWidget -> setCurrentIndex(10);
+    footerWidgetStates.push_back(10);
+}
+
+void MainWindow::on_saturationSlider_valueChanged(int value)
+{
+    // Update label
+    ui -> saturationValueLabel -> setText(QString::number(value));
+
+    // Create a temp image for previewing the effect
+    Image tempImage(image.width, image.height);
+    copyImage(image, tempImage);
+
+    // Apply the effect on temp image
+    changeSaturation(tempImage, value);
+
+    // Display temp image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(tempImage).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+}
+
+void MainWindow::on_saturationApplyBtn_clicked()
+{
+    // Apply filter
+    changeSaturation(image, ui -> saturationSlider -> value());
+
+    // Display image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+
+    // Reset slider value
+    ui -> saturationSlider -> setValue(0);
+}
+
+// Change Contrast
+
+void changeContrast(Image &image, int contrast){
+
+    // Calculate contrast change factor
+    double changeFactor = (double) (259 * (contrast + 255)) / (255 * (259 - contrast));
+
+    for (int row = 0; row < image.width; ++row) {
+        for (int col = 0; col < image.height; ++col) {
+            for (int channel = 0; channel < image.channels; ++channel) {
+                // Calculate new channel value and make sure it's between 0 and 255
+                int newVal = changeFactor * (image(row, col, channel) - 128) + 128;
+                image(row, col, channel) = max(0, min(newVal, 255));
+            }
+        }
+    }
+}
+
+void MainWindow::on_contrastBtn_clicked()
+{
+    ui ->FooterNavigationStackedWidget -> setCurrentIndex(11);
+    footerWidgetStates.push_back(11);
+}
+
+
+void MainWindow::on_contrastSlider_valueChanged(int value)
+{
+    // Update label
+    ui -> contrastValueLabel -> setText(QString::number(value));
+
+    // Create a temp image for previewing the effect
+    Image tempImage(image.width, image.height);
+    copyImage(image, tempImage);
+
+    // Apply the effect on temp image
+    changeContrast(tempImage, value);
+
+    // Display temp image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(tempImage).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+}
+
+
+void MainWindow::on_contrastApplyBtn_clicked()
+{
+    // Apply filter
+    changeContrast(image, ui -> contrastSlider -> value());
+
+    // Display image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+
+    // Reset slider value
+    ui -> contrastSlider -> setValue(0);
 }
 
 
