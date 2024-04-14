@@ -1,8 +1,8 @@
 /*
 FCAI – Structured Programming [CS112] – 2024 - Assignment 3
-Program Name:			    CS112_A3_Part1_S18_20230347_20230432_20230588.cpp
-Program Description:        The program contains: Grayscale filter, Black and White filter, Image inversion filter, Merge image filter (INCOMPLETE), Flip image filter, and Image rotation filter.
-Last Modification Date:	    27/03/2024
+Program Name:			    CS112_A3_Part2B_S18_20230347_20230432_20230588.cpp
+Program Description:        The program contains: All 18 assignment 3 filters, in addition to 2 extra filters: changing saturation and changing contrast.
+Last Modification Date:	    14/04/2024
 Author1 (name - ID - Group - Section - Email):	Hassan Ali Hassan Ali                       20230588 B S18  20230588@stud.fci-cu.edu.eg
 Author2 (name - ID - Group - Section - Email):	Momen Abd El-Kader Abd El-Naby Abd El-Kader 20230432 B S18  20230432@stud.fci-cu.edu.eg
 Author3 (name - ID - Group - Section - Email):	Mohamed Ali Hassan Amin                     20230347 B S18  11410120230347@stud.cu.edu.eg
@@ -11,6 +11,7 @@ Who did what:
     Hassan Ali:         Main Menu, Image Input Function, Image Save Function, Filter Selection Function, Invert Image Filter, Image Rotation Filters, Frame Filter, Blur Filter, Skew Filter.
     Momen Abd El-Kader: Exception Handling, Copy Image Function, Input Validation, Merge Configuration, Black and White Filter, Flip Image Filter, Crop Filter, Resize Filter, Oil Painting Filter, Old TV filter, Saturation, Constrast.
     Mohamed Ali:        Grayscale Filter, Merge Image Filter, Lighten & Darken Image Filters, Edge Detection Filter, Sunlight Filter, Purple Filter, Infrared Filter.
+GitHub Repository: https://github.com/HassanIsmail16/CS112_AS3
  */
 
 #include <bits/stdc++.h>
@@ -40,7 +41,7 @@ void invertImage(Image &image);
 
 // Image Merging
 void mergeFilter(Image &image, Image &image2);
-void mergeFilter2(Image &image, Image &image2, Image &result);
+void mergeFilter2(Image &image, Image &image2, Image &result); // Another Version for merging the common area between the 2 images.
 void mergeConfiguration(Image &image, Image &image2);
 
 // Flip Image
@@ -1278,6 +1279,8 @@ int getRadius(){
 }
 void oilPainting(Image &image, int radius){
     Image result(image.width, image.height);
+
+    // 20 color levels is adequate create oil painting effect.
     int intensityLevels = 20;
 
     cout << "Applying Oil Painting Filter..." << el;
@@ -1358,6 +1361,8 @@ void oldTVFilter(Image &image){
             image(row, col, 2) = min(image(row, col, 2) + noiseB, 255.0);
         }
     }
+
+    // Reduce brightness slightly
     darkFilter(image, 5);
 }
 
