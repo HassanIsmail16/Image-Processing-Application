@@ -1098,7 +1098,7 @@ void MainWindow::on_saturationSlider_valueChanged(int value)
 void MainWindow::on_saturationApplyBtn_clicked()
 {
     // Apply filter
-    changeSaturation(image, ui -> oilPaintingSlider -> value());
+    changeSaturation(image, ui -> saturationSlider -> value());
 
     // Display image
     ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
@@ -1106,3 +1106,58 @@ void MainWindow::on_saturationApplyBtn_clicked()
     // Reset slider value
     ui -> saturationSlider -> setValue(0);
 }
+
+// Change Contrast
+
+void changeContrast(Image &image, int contrast){
+
+    // Calculate contrast change factor
+    double changeFactor = (double) (259 * (contrast + 255)) / (255 * (259 - contrast));
+
+    for (int row = 0; row < image.width; ++row) {
+        for (int col = 0; col < image.height; ++col) {
+            for (int channel = 0; channel < image.channels; ++channel) {
+                // Calculate new channel value and make sure it's between 0 and 255
+                int newVal = changeFactor * (image(row, col, channel) - 128) + 128;
+                image(row, col, channel) = max(0, min(newVal, 255));
+            }
+        }
+    }
+}
+
+void MainWindow::on_contrastBtn_clicked()
+{
+    ui ->FooterNavigationStackedWidget -> setCurrentIndex(11);
+    footerWidgetStates.push_back(11);
+}
+
+
+void MainWindow::on_contrastSlider_valueChanged(int value)
+{
+    // Update label
+    ui -> contrastValueLabel -> setText(QString::number(value));
+
+    // Create a temp image for previewing the effect
+    Image tempImage(image.width, image.height);
+    copyImage(image, tempImage);
+
+    // Apply the effect on temp image
+    changeContrast(tempImage, value);
+
+    // Display temp image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(tempImage).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+}
+
+
+void MainWindow::on_contrastApplyBtn_clicked()
+{
+    // Apply filter
+    changeContrast(image, ui -> contrastSlider -> value());
+
+    // Display image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+
+    // Reset slider value
+    ui -> contrastSlider -> setValue(0);
+}
+

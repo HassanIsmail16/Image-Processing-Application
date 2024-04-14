@@ -94,6 +94,12 @@ private slots:
 
     void on_saturationSlider_valueChanged(int value);
 
+    void on_contrastBtn_clicked();
+
+    void on_contrastSlider_valueChanged(int value);
+
+    void on_contrastApplyBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
 
