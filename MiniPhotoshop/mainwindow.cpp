@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QImage>
 #include <QTimer>
+#include <QColorDialog>
 
 #define el "\n"
 #define space " "
@@ -33,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Start the timer
     timer->start();
+
+    // Frame Color Dialog
 }
 
 MainWindow::~MainWindow() {
@@ -127,7 +130,7 @@ void MainWindow::on_saveImage_clicked() {
     // Check if the user selected a file
     if (!savePath.isEmpty()) {
         // User selected a file, perform save operation
-        QPixmap pixmap(filename); // Example pixmap, replace with your own image
+        QPixmap pixmap(updatedImageDisplay(image));
         // Convert QPixmap to QImage
         QImage image = pixmap.toImage();
 
@@ -1099,6 +1102,66 @@ void changeSaturation(Image &image, double changePercentage){
     }
 }
 
+
+// Frame Filter
+int frameType;
+
+void MainWindow::on_frameBtn_clicked() {
+    ui -> FooterNavigationStackedWidget -> setCurrentIndex(10);
+    footerWidgetStates.push_back(10);
+}
+
+void MainWindow::on_frameType1_clicked() {
+    ui -> FooterNavigationStackedWidget -> setCurrentIndex(11);
+    footerWidgetStates.push_back(11);
+    frameType = 1;
+}
+
+
+void MainWindow::on_frameType2_clicked() {
+    ui -> FooterNavigationStackedWidget -> setCurrentIndex(11);
+    footerWidgetStates.push_back(11);
+    frameType = 2;
+}
+
+
+void MainWindow::on_frameType3_clicked() {
+    ui -> FooterNavigationStackedWidget -> setCurrentIndex(11);
+    footerWidgetStates.push_back(11);
+    frameType = 3;
+}
+
+vector<int> frameColorValues(3, 0);
+bool colorSelected = false;
+
+vector<int> MainWindow::on_frameColorBtn_clicked() {
+    QColor frameColor = QColorDialog::getColor(Qt::white, this, "Select Frame Color");
+    if (frameColor.isValid()) {
+        frameColorValues[0] = frameColor.red();
+        frameColorValues[1] = frameColor.green();
+        frameColorValues[2] = frameColor.blue();
+        colorSelected = true;
+    }
+    return frameColorValues;
+}
+
+void MainWindow::on_frameSizeBtn_clicked() {
+    ui -> FooterNavigationStackedWidget -> setCurrentIndex(12);
+    footerWidgetStates.push_back(12);
+}
+
+void MainWindow::on_frameSizeSlider_valueChanged(int value) {
+    ui -> frameSizeValueLabel -> setText(QString::number(value));
+    Image tempImage(image.width, image.height);
+    tempImage = image;
+    //frameFilter
+}
+
+void MainWindow::on_frameSizeApplyBtn_clicked() {
+    // framefilter(image)
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+    ui -> frameSizeSlider -> setValue(0);
+}
 
 
 void MainWindow::on_saturationBtn_clicked()

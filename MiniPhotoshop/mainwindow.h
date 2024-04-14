@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QColorDialog>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -87,6 +88,22 @@ private slots:
     void on_skewAngleSlider_valueChanged(int value);
 
     void on_skewApplyBtn_clicked();
+
+    std::vector<int> on_frameColorBtn_clicked();
+
+    void on_frameBtn_clicked();
+
+    void on_frameType1_clicked();
+
+    void on_frameType2_clicked();
+
+    void on_frameType3_clicked();
+
+    void on_frameSizeBtn_clicked();
+
+    void on_frameSizeSlider_valueChanged(int value);
+
+    void on_frameSizeApplyBtn_clicked();
 
     void on_saturationApplyBtn_clicked();
 
