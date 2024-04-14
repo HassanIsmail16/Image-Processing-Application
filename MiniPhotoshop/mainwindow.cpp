@@ -811,6 +811,35 @@ void flipImageVertically(Image &image){
     }
 }
 
+// Flip Buttons Functionality
+void MainWindow::on_flipBtn_clicked()
+{
+    // Navigate to flip page
+    ui->FooterNavigationStackedWidget -> setCurrentIndex(12);
+    footerWidgetStates.push_back(12);
+}
+
+
+void MainWindow::on_flipVerticallyBtn_clicked()
+{
+    // Apply filter on image
+    flipImageVertically(image);
+
+    // Display new image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+}
+
+void MainWindow::on_flipHorizontallyBtn_clicked()
+{
+    // Apply filter on image
+    flipImageHorizontally(image);
+
+    // Display new image
+    ui -> imageDisplay -> setPixmap(updatedImageDisplay(image).scaledToWidth(min(ui -> imageDisplay -> width() * 5, 400), Qt::SmoothTransformation));
+}
+
+
+
 
 // Rotate Button Functionality
 void MainWindow::on_rotateBtn_clicked() {
@@ -1160,4 +1189,5 @@ void MainWindow::on_contrastApplyBtn_clicked()
     // Reset slider value
     ui -> contrastSlider -> setValue(0);
 }
+
 

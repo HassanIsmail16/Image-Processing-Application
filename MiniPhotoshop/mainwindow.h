@@ -100,6 +100,12 @@ private slots:
 
     void on_contrastApplyBtn_clicked();
 
+    void on_flipHorizontallyBtn_clicked();
+
+    void on_flipVerticallyBtn_clicked();
+
+    void on_flipBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
 
