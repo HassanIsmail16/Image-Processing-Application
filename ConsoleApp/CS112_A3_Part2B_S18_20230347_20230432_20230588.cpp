@@ -1,8 +1,8 @@
 /*
 FCAI – Structured Programming [CS112] – 2024 - Assignment 3
-Program Name:			    CS112_A3_Part1_S18_20230347_20230432_20230588.cpp
-Program Description:        The program contains: Grayscale filter, Black and White filter, Image inversion filter, Merge image filter (INCOMPLETE), Flip image filter, and Image rotation filter.
-Last Modification Date:	    27/03/2024
+Program Name:			    CS112_A3_Part2B_S18_20230347_20230432_20230588.cpp
+Program Description:        The program contains: All 18 assignment 3 filters, in addition to 2 extra filters: changing saturation and changing contrast.
+Last Modification Date:	    14/04/2024
 Author1 (name - ID - Group - Section - Email):	Hassan Ali Hassan Ali                       20230588 B S18  20230588@stud.fci-cu.edu.eg
 Author2 (name - ID - Group - Section - Email):	Momen Abd El-Kader Abd El-Naby Abd El-Kader 20230432 B S18  20230432@stud.fci-cu.edu.eg
 Author3 (name - ID - Group - Section - Email):	Mohamed Ali Hassan Amin                     20230347 B S18  11410120230347@stud.cu.edu.eg
