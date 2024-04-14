@@ -120,7 +120,7 @@ border-radius: 25px;</string>
               </size>
              </property>
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="footer0">
               <layout class="QGridLayout" name="gridLayout_7">
@@ -1649,6 +1649,156 @@ font: 8pt &quot;Poppins&quot;;</string>
                </item>
                <item row="0" column="2">
                 <spacer name="horizontalSpacer_24">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Maximum</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>280</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="saturation11">
+              <layout class="QGridLayout" name="gridLayout_21">
+               <item row="0" column="0">
+                <spacer name="horizontalSpacer_25">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Maximum</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>280</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="0" column="1">
+                <widget class="QFrame" name="navigation_11">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>60</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">background-color: rgb(39, 39, 39);
+border-radius: 15px;</string>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_17">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_8">
+                    <property name="styleSheet">
+                     <string notr="true">font: 700 8pt &quot;Poppins&quot;;</string>
+                    </property>
+                    <property name="text">
+                     <string>Saturation Level</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <layout class="QHBoxLayout" name="horizontalLayout_12">
+                    <item>
+                     <widget class="QSlider" name="saturationSlider">
+                      <property name="maximumSize">
+                       <size>
+                        <width>130</width>
+                        <height>16777215</height>
+                       </size>
+                      </property>
+                      <property name="minimum">
+                       <number>-100</number>
+                      </property>
+                      <property name="maximum">
+                       <number>100</number>
+                      </property>
+                      <property name="singleStep">
+                       <number>1</number>
+                      </property>
+                      <property name="pageStep">
+                       <number>2</number>
+                      </property>
+                      <property name="value">
+                       <number>0</number>
+                      </property>
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="tickPosition">
+                       <enum>QSlider::TicksBelow</enum>
+                      </property>
+                      <property name="tickInterval">
+                       <number>20</number>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="saturationValueLabel">
+                      <property name="minimumSize">
+                       <size>
+                        <width>31</width>
+                        <height>16</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>31</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>0</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="saturationApplyBtn">
+                      <property name="minimumSize">
+                       <size>
+                        <width>45</width>
+                        <height>13</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>50</width>
+                        <height>16777215</height>
+                       </size>
+                      </property>
+                      <property name="cursor">
+                       <cursorShape>PointingHandCursor</cursorShape>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">color: rgb(0,0,0);
+background-color: rgb(255, 255, 255);
+border-radius: 5px;
+font: 8pt &quot;Poppins&quot;;</string>
+                      </property>
+                      <property name="text">
+                       <string>Apply</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item row="0" column="2">
+                <spacer name="horizontalSpacer_26">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
