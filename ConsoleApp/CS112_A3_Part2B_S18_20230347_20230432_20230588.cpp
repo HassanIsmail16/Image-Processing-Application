@@ -15,7 +15,7 @@ GitHub Repository: https://github.com/HassanIsmail16/CS112_AS3
  */
 
 #include <bits/stdc++.h>
-#include "../../Image_Class.h"
+#include "../Image Class/Image_Class.h"
 #define el '\n'
 #define space ' '
 
