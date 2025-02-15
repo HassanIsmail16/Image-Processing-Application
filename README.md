@@ -1,4 +1,4 @@
-#  CS112_A3
+#  Image Processing Application
 This repository is used to develop an `image processing application` as a part of the Structured Programming course's third assignment provided by [FCAI Cairo University](https://fcai.cu.edu.eg/).
 
 Team Members: [Hassan Ali](https://github.com/HassanIsmail16), [Momen Abd El-Kader](https://github.com/Momen-Abdelkader), and [Mohamed Ali](https://github.com/MoAli488).
